@@ -3,9 +3,17 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  // Si viene con ?list=true, devolver lista de modelos disponibles
+  if (event.queryStringParameters?.list === 'true') {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    const d = await r.json();
+    return { statusCode: 200, headers: {'Content-Type':'application/json'}, body: JSON.stringify(d) };
+  }
+
   try {
     const { parts } = JSON.parse(event.body);
-    const apiKey = process.env.GEMINI_API_KEY;
 
     const geminiParts = parts.map(p => {
       if (p.type === 'image') {
@@ -15,10 +23,16 @@ exports.handler = async (event) => {
       }
     });
 
-    // Intentar con gemini-2.0-flash, fallback a gemini-pro-vision
-    const models = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-pro-vision'];
-    let data, lastError;
+    const models = [
+      'gemini-2.0-flash',
+      'gemini-2.0-flash-lite',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-latest',
+      'gemini-1.5-pro',
+      'gemini-1.5-pro-latest',
+    ];
 
+    let data, lastStatus;
     for (const model of models) {
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
@@ -31,13 +45,13 @@ exports.handler = async (event) => {
           })
         }
       );
+      lastStatus = response.status;
       data = await response.json();
-      if (response.ok) break;
-      lastError = data;
+      if (response.ok && data?.candidates?.[0]) break;
     }
 
     if (!data?.candidates?.[0]) {
-      return { statusCode: 400, body: JSON.stringify(lastError || data) };
+      return { statusCode: lastStatus || 400, body: JSON.stringify(data) };
     }
 
     const text = data.candidates[0].content.parts[0].text || '';
