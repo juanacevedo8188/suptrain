@@ -1,15 +1,20 @@
 exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-
   const apiKey = process.env.GEMINI_API_KEY;
 
-  // Si viene con ?list=true, devolver lista de modelos disponibles
-  if (event.queryStringParameters?.list === 'true') {
+  // GET ?list=true — listar modelos disponibles
+  if (event.httpMethod === 'GET' && event.queryStringParameters?.list === 'true') {
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
     const d = await r.json();
-    return { statusCode: 200, headers: {'Content-Type':'application/json'}, body: JSON.stringify(d) };
+    const names = (d.models || []).map(m => m.name);
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(names)
+    };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   try {
