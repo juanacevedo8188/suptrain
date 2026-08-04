@@ -22,34 +22,47 @@ exports.handler = async (event) => {
       }
     });
 
-    const model = 'gemini-2.5-flash';
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: geminiParts }],
-          generationConfig: {
-            maxOutputTokens: 2048,
-            temperature: 0,
-            responseMimeType: 'application/json'  // Forzar respuesta JSON
-          }
-        })
-      }
-    );
+    // Probar modelos disponibles en tu cuenta
+    const models = [
+      'gemini-2.5-pro',
+      'gemini-3-flash-preview',
+      'gemini-flash-latest',
+      'gemini-pro-latest',
+      'gemini-3.5-flash',
+      'gemini-3.6-flash',
+    ];
 
-    const data = await response.json();
+    let data, lastStatus, usedModel;
+    for (const model of models) {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: geminiParts }],
+            generationConfig: {
+              maxOutputTokens: 2048,
+              temperature: 0,
+              responseMimeType: 'application/json'
+            }
+          })
+        }
+      );
+      lastStatus = response.status;
+      data = await response.json();
+      if (response.ok && data?.candidates?.[0]) { usedModel = model; break; }
+    }
 
-    if (!response.ok || !data?.candidates?.[0]) {
-      return { statusCode: response.status, body: JSON.stringify(data) };
+    if (!data?.candidates?.[0]) {
+      return { statusCode: lastStatus || 400, body: JSON.stringify(data) };
     }
 
     const text = data.candidates[0].content.parts[0].text || '';
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: [{ type: 'text', text }] })
+      body: JSON.stringify({ content: [{ type: 'text', text }], model: usedModel })
     };
 
   } catch (err) {
