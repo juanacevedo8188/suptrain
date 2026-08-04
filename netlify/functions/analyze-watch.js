@@ -22,24 +22,29 @@ exports.handler = async (event) => {
       }
     });
 
-    // Usar gemini-2.0-flash directamente — confirmado disponible
-    const model = 'gemini-2.0-flash';
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: geminiParts }],
-          generationConfig: { maxOutputTokens: 800, temperature: 0.1 }
-        })
-      }
-    );
+    // Probar modelos en orden de preferencia
+    const models = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-flash-latest', 'gemini-pro-latest'];
+    let data, lastStatus;
 
-    const data = await response.json();
+    for (const model of models) {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: geminiParts }],
+            generationConfig: { maxOutputTokens: 800, temperature: 0.1 }
+          })
+        }
+      );
+      lastStatus = response.status;
+      data = await response.json();
+      if (response.ok && data?.candidates?.[0]) break;
+    }
 
-    if (!response.ok || !data?.candidates?.[0]) {
-      return { statusCode: response.status, body: JSON.stringify(data) };
+    if (!data?.candidates?.[0]) {
+      return { statusCode: lastStatus || 400, body: JSON.stringify(data) };
     }
 
     const text = data.candidates[0].content.parts[0].text || '';
