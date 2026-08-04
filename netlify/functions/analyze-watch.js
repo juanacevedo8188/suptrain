@@ -7,40 +7,40 @@ exports.handler = async (event) => {
     const { parts } = JSON.parse(event.body);
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Convertir formato: las imágenes vienen en base64, el texto como text
     const geminiParts = parts.map(p => {
       if (p.type === 'image') {
-        return {
-          inlineData: {
-            mimeType: p.source.media_type,
-            data: p.source.data
-          }
-        };
+        return { inlineData: { mimeType: p.source.media_type, data: p.source.data } };
       } else {
         return { text: p.text };
       }
     });
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: geminiParts }],
-          generationConfig: { maxOutputTokens: 800, temperature: 0.1 }
-        })
-      }
-    );
+    // Intentar con gemini-2.0-flash, fallback a gemini-pro-vision
+    const models = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-pro-vision'];
+    let data, lastError;
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return { statusCode: response.status, body: JSON.stringify(data) };
+    for (const model of models) {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: geminiParts }],
+            generationConfig: { maxOutputTokens: 800, temperature: 0.1 }
+          })
+        }
+      );
+      data = await response.json();
+      if (response.ok) break;
+      lastError = data;
     }
 
-    // Extraer texto de la respuesta de Gemini y convertir al formato que espera el HTML
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!data?.candidates?.[0]) {
+      return { statusCode: 400, body: JSON.stringify(lastError || data) };
+    }
+
+    const text = data.candidates[0].content.parts[0].text || '';
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -48,9 +48,6 @@ exports.handler = async (event) => {
     };
 
   } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
 };
