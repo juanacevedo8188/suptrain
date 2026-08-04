@@ -1,16 +1,10 @@
 exports.handler = async (event) => {
   const apiKey = process.env.GEMINI_API_KEY;
 
-  // GET ?list=true — listar modelos disponibles
   if (event.httpMethod === 'GET' && event.queryStringParameters?.list === 'true') {
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
     const d = await r.json();
-    const names = (d.models || []).map(m => m.name);
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(names)
-    };
+    return { statusCode: 200, headers: {'Content-Type':'application/json'}, body: JSON.stringify((d.models||[]).map(m=>m.name)) };
   }
 
   if (event.httpMethod !== 'POST') {
@@ -28,35 +22,24 @@ exports.handler = async (event) => {
       }
     });
 
-    const models = [
-      'gemini-2.0-flash',
-      'gemini-2.0-flash-lite',
-      'gemini-1.5-flash',
-      'gemini-1.5-flash-latest',
-      'gemini-1.5-pro',
-      'gemini-1.5-pro-latest',
-    ];
+    // Usar gemini-2.0-flash directamente — confirmado disponible
+    const model = 'gemini-2.0-flash';
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: geminiParts }],
+          generationConfig: { maxOutputTokens: 800, temperature: 0.1 }
+        })
+      }
+    );
 
-    let data, lastStatus;
-    for (const model of models) {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: geminiParts }],
-            generationConfig: { maxOutputTokens: 800, temperature: 0.1 }
-          })
-        }
-      );
-      lastStatus = response.status;
-      data = await response.json();
-      if (response.ok && data?.candidates?.[0]) break;
-    }
+    const data = await response.json();
 
-    if (!data?.candidates?.[0]) {
-      return { statusCode: lastStatus || 400, body: JSON.stringify(data) };
+    if (!response.ok || !data?.candidates?.[0]) {
+      return { statusCode: response.status, body: JSON.stringify(data) };
     }
 
     const text = data.candidates[0].content.parts[0].text || '';
