@@ -24,17 +24,20 @@ on conflict (id) do nothing;
 --    coach lo usa — esto es consistente con cómo están armadas hoy el resto
 --    de las tablas de la app (el control de rol coach/atleta se hace en el
 --    frontend, no en RLS).
-create policy if not exists "plan-pdfs authenticated insert"
+drop policy if exists "plan-pdfs authenticated insert" on storage.objects;
+create policy "plan-pdfs authenticated insert"
   on storage.objects for insert
   to authenticated
   with check (bucket_id = 'plan-pdfs');
 
-create policy if not exists "plan-pdfs authenticated update"
+drop policy if exists "plan-pdfs authenticated update" on storage.objects;
+create policy "plan-pdfs authenticated update"
   on storage.objects for update
   to authenticated
   using (bucket_id = 'plan-pdfs');
 
-create policy if not exists "plan-pdfs authenticated delete"
+drop policy if exists "plan-pdfs authenticated delete" on storage.objects;
+create policy "plan-pdfs authenticated delete"
   on storage.objects for delete
   to authenticated
   using (bucket_id = 'plan-pdfs');
