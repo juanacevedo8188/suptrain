@@ -5161,6 +5161,14 @@ function handlePlanPdfDrop(e) {
 
 async function handlePlanPdf(file) {
   if (!file) return;
+
+  // Netlify limita el body de las funciones a ~6MB; el base64 infla el PDF ~33%.
+  const MAX_PDF_BYTES = 4.5 * 1024 * 1024;
+  if (file.size > MAX_PDF_BYTES) {
+    showPdfStatus('error', `✕ El PDF pesa ${(file.size/1024/1024).toFixed(1)}MB, el máximo es 4.5MB. Comprimilo (ej: en Acrobat o smallpdf.com) y volvé a intentar.`);
+    return;
+  }
+
   document.getElementById('pdf-file-name').textContent = file.name;
   document.getElementById('pdf-file-name').style.display = 'block';
   document.getElementById('pdf-drop-hint').style.display = 'none';
@@ -5174,10 +5182,14 @@ async function handlePlanPdf(file) {
       body: JSON.stringify({ pdfBase64: base64 })
     });
 
-    if (!response.ok) throw new Error('Error ' + response.status);
-    const result = await response.json();
+    const result = await response.json().catch(() => null);
+    if (!response.ok) {
+      const detail = result?.detail ? ` (${result.detail})` : '';
+      throw new Error((result?.error || 'Error ' + response.status) + detail);
+    }
+    if (!result) throw new Error('Respuesta vacía del servidor');
 
-    if (!result.weeks?.length) throw new Error('No se detectaron semanas');
+    if (!result.weeks?.length) throw new Error('No se detectaron semanas en el PDF');
 
     parsedPlanData = result;
 

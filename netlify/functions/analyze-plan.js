@@ -5,6 +5,9 @@ exports.handler = async (event) => {
     const { pdfBase64 } = JSON.parse(event.body);
     const apiKey = process.env.GEMINI_API_KEY;
 
+    if (!apiKey) {
+      return { statusCode: 500, body: JSON.stringify({ error: 'GEMINI_API_KEY no está configurada en Netlify (Site settings → Environment variables)' }) };
+    }
     if (!pdfBase64) {
       return { statusCode: 400, body: JSON.stringify({ error: 'No PDF data received' }) };
     }
@@ -21,15 +24,15 @@ Reglas:
 - Si no hay actividad un día, omitilo del array
 - SOLO JSON, nada más`;
 
-    // Intentar con varios modelos que soporten PDF
+    // Solo modelos vigentes que soportan PDF. Flash primero: es rápido y evita
+    // el timeout de 10s de Netlify; Pro queda como único fallback si flash falla.
+    // (gemini-1.5-* está deprecado por Google y solo agregaba latencia con 404s)
     const models = [
-      'gemini-2.5-pro',
       'gemini-2.5-flash',
-      'gemini-1.5-pro',
-      'gemini-1.5-flash',
+      'gemini-2.5-pro',
     ];
 
-    let data, lastStatus, lastError;
+    let data, lastStatus, lastError, finishReason;
 
     for (const model of models) {
       try {
@@ -45,35 +48,37 @@ Reglas:
                   { text: prompt }
                 ]
               }],
-              generationConfig: { maxOutputTokens: 8192, temperature: 0 }
+              generationConfig: { maxOutputTokens: 65536, temperature: 0, responseMimeType: 'application/json' }
             })
           }
         );
         lastStatus = response.status;
         data = await response.json();
-        if (response.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        finishReason = data?.candidates?.[0]?.finishReason;
+        if (response.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text && finishReason !== 'MAX_TOKENS') {
           break;
         }
-        lastError = data?.error?.message || 'Unknown error';
+        lastError = data?.error?.message || (finishReason ? `finishReason: ${finishReason}` : 'Unknown error');
       } catch(e) {
         lastError = e.message;
       }
     }
 
     if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-      return { 
-        statusCode: 500, 
-        body: JSON.stringify({ error: 'No model could process the PDF', detail: lastError }) 
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'No se pudo procesar el PDF', detail: lastError, status: lastStatus })
       };
     }
 
     let text = data.candidates[0].content.parts[0].text || '';
-    
-    // Extraer JSON de la respuesta
+
+    // Con responseMimeType:'application/json' esto ya debería ser JSON puro,
+    // pero dejamos la extracción como red de seguridad por si el modelo agrega texto extra.
     const start = text.indexOf('{');
     const end = text.lastIndexOf('}');
     if (start === -1 || end === -1) {
-      return { statusCode: 500, body: JSON.stringify({ error: 'No JSON found in response', raw: text.substring(0, 500) }) };
+      return { statusCode: 500, body: JSON.stringify({ error: 'No se encontró JSON en la respuesta', raw: text.substring(0, 500) }) };
     }
     text = text.substring(start, end + 1);
 
