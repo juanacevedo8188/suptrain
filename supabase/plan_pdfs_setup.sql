@@ -9,6 +9,11 @@ alter table training_plans
   add column if not exists file_url text,
   add column if not exists file_path text;
 
+-- La columna "weeks" (del viejo flujo con IA) tenía NOT NULL — ya no la
+-- llenamos, así que hay que sacarle esa restricción.
+alter table training_plans
+  alter column weeks drop not null;
+
 -- 2) Bucket público para los PDFs de planes.
 --    Público = cualquiera con el link puede verlo (sin login). Es lo mismo
 --    nivel de exposición que ya tiene, por ejemplo, el avatar de un usuario.
