@@ -11,6 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';</script>
 <style>
 :root{
   --bg:#0a0e14;--bg2:#111720;--bg3:#181f2b;--surface:#1e2735;--surface2:#252e3f;
@@ -1104,7 +1106,7 @@ tbody tr:hover td{background:var(--accent-dim);color:var(--text);}
     <div id="page-myplans" class="hidden">
       <div class="page-header flex between wrap gap12">
         <div><div class="page-title">MIS PLANES</div><div class="page-subtitle">Planes de entrenamiento personalizados</div></div>
-        <button class="btn btn-primary" onclick="openModal('modal-upload-plan')">
+        <button class="btn btn-primary" id="btn-upload-plan" onclick="openModal('modal-upload-plan')">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Cargar plan PDF
         </button>
       </div>
@@ -1916,7 +1918,7 @@ tbody tr:hover td{background:var(--accent-dim);color:var(--text);}
 <div class="modal-overlay hidden" id="modal-upload-plan">
   <div class="modal" style="max-width:560px">
     <div class="modal-header">
-      <div class="modal-title">Cargar plan desde PDF</div>
+      <div class="modal-title">Cargar plan (PDF)</div>
       <button class="btn-icon" onclick="closeModal('modal-upload-plan')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
@@ -1929,19 +1931,15 @@ tbody tr:hover td{background:var(--accent-dim);color:var(--text);}
         <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 10px;opacity:.4;display:block"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg>
         <div id="pdf-drop-hint">
           <div style="font-size:.9rem;color:var(--text2);font-weight:500">Arrastrá o tocá para subir el PDF</div>
-          <div style="font-size:.75rem;color:var(--text3);margin-top:4px">La IA leerá el plan y lo cargará automáticamente</div>
+          <div style="font-size:.75rem;color:var(--text3);margin-top:4px">Se sube tal cual — tus alumnos lo van a ver directamente</div>
         </div>
         <div id="pdf-file-name" style="display:none;font-size:.85rem;color:var(--accent);font-weight:500"></div>
       </div>
 
       <div id="pdf-status" class="watch-import-status hidden" style="margin-top:10px"></div>
 
-      <!-- Preview del plan detectado -->
-      <div id="pdf-plan-preview" style="display:none;margin-top:16px">
-        <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;font-weight:500">Plan detectado</div>
-        <div id="pdf-weeks-preview" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
-        <div id="pdf-plan-content" style="max-height:200px;overflow-y:auto;background:var(--bg3);border-radius:var(--r);padding:12px;font-size:.8rem;color:var(--text2);line-height:1.5"></div>
-      </div>
+      <!-- Preview del PDF como imagen -->
+      <div id="pdf-plan-preview" style="display:none;margin-top:16px;max-height:280px;overflow-y:auto;background:var(--bg3);border-radius:var(--r);padding:8px"></div>
 
       <!-- Título del plan -->
       <div class="form-group" id="pdf-title-group" style="display:none;margin-top:14px">
@@ -1972,10 +1970,27 @@ tbody tr:hover td{background:var(--accent-dim);color:var(--text);}
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-upload-plan')">Cancelar</button>
-      <button class="btn btn-primary" id="btn-save-plan" style="display:none" onclick="savePlanFromPdf()">
+      <button class="btn btn-primary" id="btn-save-plan-pdf" style="display:none" onclick="savePlanFromPdf()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
         Guardar plan
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VER PLAN COMPLETO -->
+<div class="modal-overlay hidden" id="modal-view-plan">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <div class="modal-title" id="view-plan-title">Plan</div>
+      <button class="btn-icon" onclick="closeModal('modal-view-plan')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="view-plan-pages" style="max-height:70vh;overflow-y:auto"></div>
+    </div>
+    <div class="modal-footer">
+      <a class="btn btn-ghost" id="view-plan-download" href="#" target="_blank" rel="noopener">Abrir original</a>
+      <button class="btn btn-primary" onclick="closeModal('modal-view-plan')">Cerrar</button>
     </div>
   </div>
 </div>
@@ -2371,7 +2386,7 @@ function applyRoles() {
   document.getElementById('nav-athletes').style.display = isCoach ? '' : 'none';
   document.getElementById('nav-admin').style.display = isAdmin() ? '' : 'none';
   document.getElementById('nav-plan').style.display = '';  // visible para todos
-  if (isCoach) document.getElementById('nav-myplans').style.display = '';
+  document.getElementById('nav-myplans').style.display = '';  // visible para todos (coach carga, alumno ve)
   document.getElementById('btn-save-plan').style.display = isCoach ? '' : 'none';
   document.getElementById('plan-target-row').style.display = isCoach ? '' : 'none';
 }
@@ -5065,83 +5080,93 @@ async function notifyWorkoutCreated(workoutTitle, target, athleteId) {
   }
 }
 
-// ── PLANES PERSONALIZADOS ──
-let parsedPlanData = null;
+// ── PLANES PERSONALIZADOS (PDF subido tal cual, sin IA) ──
+let selectedPlanFile = null;
 let planTarget = 'group';
+const PLAN_PDF_BUCKET = 'plan-pdfs';
 
 async function loadMyPlans() {
   if (!currentAthlete) return;
-  const { data: plans } = await sb.from('training_plans')
+  const isCoach = currentAthlete.roles?.includes('coach');
+
+  let query = sb.from('training_plans')
     .select('*, athlete:athlete_id(name)')
-    .eq('coach_id', currentAthlete.id)
     .eq('active', true)
     .order('created_at', { ascending: false });
+
+  query = isCoach
+    ? query.eq('coach_id', currentAthlete.id)
+    : query.or(`target.eq.group,athlete_id.eq.${currentAthlete.id}`);
+
+  const { data: plans } = await query;
+
+  document.getElementById('btn-upload-plan').style.display = isCoach ? '' : 'none';
 
   const container = document.getElementById('myplans-list');
   if (!plans?.length) {
     container.innerHTML = `<div class="empty-state" style="padding:48px">
-      <p>Todavía no cargaste ningún plan</p>
-      <button class="btn btn-primary" onclick="openModal('modal-upload-plan')" style="margin-top:12px">
-        Cargar primer plan
-      </button>
+      <p>${isCoach ? 'Todavía no cargaste ningún plan' : 'Todavía no tenés planes cargados'}</p>
+      ${isCoach ? `<button class="btn btn-primary" onclick="openModal('modal-upload-plan')" style="margin-top:12px">Cargar primer plan</button>` : ''}
     </div>`;
     return;
   }
 
-  container.innerHTML = plans.map(p => {
-    const weeks = p.weeks || [];
-    return `<div class="card" style="margin-bottom:14px">
+  container.innerHTML = plans.map(p => `<div class="card" style="margin-bottom:14px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
         <div>
           <div style="font-weight:600;font-size:.95rem">${p.title}</div>
           <div style="font-size:.75rem;color:var(--text3);margin-top:3px">
             ${p.target === 'group' ? '👥 Todo el grupo' : `👤 ${p.athlete?.name || 'Alumno específico'}`}
-            · ${weeks.length} semana${weeks.length !== 1 ? 's' : ''}
             · ${new Date(p.created_at).toLocaleDateString('es-AR')}
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
-          <button class="btn btn-sm btn-ghost" onclick="openPlanDetail('${p.id}')">Ver</button>
-          <button class="btn-icon danger" onclick="deletePlan('${p.id}')">
+          <button class="btn btn-sm btn-ghost" onclick="openPlanViewer('${p.file_url}','${(p.title||'').replace(/'/g,"\\'")}')">Ver completo</button>
+          ${isCoach ? `<button class="btn-icon danger" onclick="deletePlan('${p.id}')">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
-          </button>
+          </button>` : ''}
         </div>
       </div>
-      <!-- Tabs de semanas -->
-      <div class="plan-week-tab">
-        ${weeks.map((w, i) => `<button class="plan-week-btn${i===0?' active':''}" onclick="showPlanWeek('${p.id}',${i},this)">Semana ${i+1}</button>`).join('')}
-      </div>
-      <div id="plan-weeks-${p.id}">
-        ${renderPlanWeek(weeks[0], p.id, 0)}
-      </div>
-    </div>`;
-  }).join('');
-}
+      <div class="plan-thumb" style="cursor:pointer;background:var(--bg3);border-radius:var(--r);overflow:hidden" onclick="openPlanViewer('${p.file_url}','${(p.title||'').replace(/'/g,"\\'")}')"></div>
+    </div>`).join('');
 
-function renderPlanWeek(week, planId, weekIdx) {
-  if (!week?.days) return '<div style="color:var(--text3);font-size:.82rem">Sin datos</div>';
-  const dayNames = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
-  const typeColors = { agua:'var(--accent)', tierra:'var(--success)', gym:'var(--purple)', descanso:'var(--text3)', competencia:'var(--pink)' };
-  return week.days.map((d, i) => {
-    if (!d || (!d.title && !d.description)) return '';
-    const color = typeColors[d.type] || 'var(--accent)';
-    return `<div class="plan-block" style="border-left-color:${color}">
-      <div class="plan-block-day">${dayNames[i] || 'Día ' + (i+1)}</div>
-      <div class="plan-block-title">${d.title || ''}</div>
-      ${d.description ? `<div class="plan-block-desc">${d.description}</div>` : ''}
-    </div>`;
-  }).join('');
-}
-
-function showPlanWeek(planId, weekIdx, btn) {
-  btn.closest('.card').querySelectorAll('.plan-week-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  // Buscar el plan
-  sb.from('training_plans').select('weeks').eq('id', planId).maybeSingle().then(({ data }) => {
-    if (data?.weeks?.[weekIdx]) {
-      document.getElementById('plan-weeks-' + planId).innerHTML = renderPlanWeek(data.weeks[weekIdx], planId, weekIdx);
-    }
+  // Render del thumbnail (1ra página) de cada plan, sin bloquear el render de la lista
+  plans.forEach((p, i) => {
+    const el = container.children[i]?.querySelector('.plan-thumb');
+    if (el && p.file_url) renderPdfPreview(p.file_url, el, { maxPages: 1, scale: 0.6 });
   });
+}
+
+async function openPlanViewer(fileUrl, title) {
+  document.getElementById('view-plan-title').textContent = title || 'Plan';
+  document.getElementById('view-plan-download').href = fileUrl;
+  openModal('modal-view-plan');
+  await renderPdfPreview(fileUrl, document.getElementById('view-plan-pages'), { scale: 1.4 });
+}
+
+// Renderiza un PDF (URL remota o ArrayBuffer local) como imágenes dentro de un contenedor
+async function renderPdfPreview(source, container, opts = {}) {
+  container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:.8rem">Cargando…</div>';
+  try {
+    const loadingTask = typeof source === 'string' ? pdfjsLib.getDocument(source) : pdfjsLib.getDocument({ data: source });
+    const pdf = await loadingTask.promise;
+    container.innerHTML = '';
+    const scale = opts.scale || 1.3;
+    const numPages = opts.maxPages ? Math.min(opts.maxPages, pdf.numPages) : pdf.numPages;
+    for (let i = 1; i <= numPages; i++) {
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.style.cssText = 'width:100%;display:block;border-radius:var(--r);margin-bottom:8px';
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+      container.appendChild(canvas);
+    }
+  } catch (err) {
+    console.error('PDF render error:', err);
+    container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--danger);font-size:.8rem">No se pudo mostrar la vista previa.</div>`;
+  }
 }
 
 async function deletePlan(id) {
@@ -5162,58 +5187,32 @@ function handlePlanPdfDrop(e) {
 async function handlePlanPdf(file) {
   if (!file) return;
 
-  // Netlify limita el body de las funciones a ~6MB; el base64 infla el PDF ~33%.
-  const MAX_PDF_BYTES = 4.5 * 1024 * 1024;
+  if (file.type !== 'application/pdf') {
+    showPdfStatus('error', '✕ Tiene que ser un archivo PDF');
+    return;
+  }
+  const MAX_PDF_BYTES = 20 * 1024 * 1024;
   if (file.size > MAX_PDF_BYTES) {
-    showPdfStatus('error', `✕ El PDF pesa ${(file.size/1024/1024).toFixed(1)}MB, el máximo es 4.5MB. Comprimilo (ej: en Acrobat o smallpdf.com) y volvé a intentar.`);
+    showPdfStatus('error', `✕ El PDF pesa ${(file.size/1024/1024).toFixed(1)}MB, el máximo es 20MB.`);
     return;
   }
 
+  selectedPlanFile = file;
   document.getElementById('pdf-file-name').textContent = file.name;
   document.getElementById('pdf-file-name').style.display = 'block';
   document.getElementById('pdf-drop-hint').style.display = 'none';
-  showPdfStatus('loading', '<span class="spin">⟳</span> Leyendo PDF con IA...');
+  showPdfStatus('loading', '<span class="spin">⟳</span> Generando vista previa...');
 
   try {
-    const base64 = await fileToBase64(file);
-    const response = await fetch('/.netlify/functions/analyze-plan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pdfBase64: base64 })
-    });
+    const buffer = await file.arrayBuffer();
+    const previewEl = document.getElementById('pdf-plan-preview');
+    previewEl.style.display = 'block';
+    await renderPdfPreview(buffer, previewEl, { scale: 1 });
 
-    const result = await response.json().catch(() => null);
-    if (!response.ok) {
-      const detail = result?.detail ? ` (${result.detail})` : '';
-      throw new Error((result?.error || 'Error ' + response.status) + detail);
-    }
-    if (!result) throw new Error('Respuesta vacía del servidor');
-
-    if (!result.weeks?.length) throw new Error('No se detectaron semanas en el PDF');
-
-    parsedPlanData = result;
-
-    // Preview
-    document.getElementById('pdf-plan-preview').style.display = 'block';
-    document.getElementById('pdf-weeks-preview').innerHTML =
-      result.weeks.map((w, i) => `<span class="badge badge-teal">Semana ${i+1} · ${w.days?.filter(d=>d?.title).length || 0} días</span>`).join('');
-
-    // Mostrar resumen del plan
-    const summary = result.weeks.map((w, wi) => {
-      const dayLines = (w.days || []).map((d, di) => {
-        if (!d?.title) return '';
-        const days = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-        return days[di] + ': ' + d.title;
-      }).filter(Boolean).join('\n');
-      return 'SEMANA ' + (wi + 1) + '\n' + dayLines;
-    }).join('\n\n');
-    document.getElementById('pdf-plan-content').textContent = summary;
-
-    // Mostrar controles
     document.getElementById('pdf-title-group').style.display = 'block';
-    document.getElementById('pdf-plan-title').value = result.title || file.name.replace('.pdf','');
+    document.getElementById('pdf-plan-title').value = file.name.replace(/\.pdf$/i, '');
     document.getElementById('pdf-target-group').style.display = 'block';
-    document.getElementById('btn-save-plan').style.display = '';
+    document.getElementById('btn-save-plan-pdf').style.display = '';
 
     // Cargar atletas en el selector
     const { data: athletes } = await sb.from('athletes').select('id,name').eq('active', true).neq('id', currentAthlete.id);
@@ -5221,8 +5220,7 @@ async function handlePlanPdf(file) {
     sel.innerHTML = '<option value="">— seleccionar —</option>' +
       (athletes || []).map(a => `<option value="${a.id}">${a.name}</option>`).join('');
 
-    showPdfStatus('success', `✓ ${result.weeks.length} semanas detectadas — revisá y guardá`);
-
+    showPdfStatus('success', '✓ Listo — revisá y guardá');
   } catch(err) {
     console.error('PDF error:', err);
     showPdfStatus('error', '✕ Error: ' + (err.message || 'desconocido'));
@@ -5244,21 +5242,34 @@ function setPlanTarget(target) {
 }
 
 async function savePlanFromPdf() {
-  if (!parsedPlanData || !currentAthlete) return;
+  if (!selectedPlanFile || !currentAthlete) return;
   const title = document.getElementById('pdf-plan-title').value.trim() || 'Plan sin nombre';
   const athleteId = planTarget === 'individual' ? document.getElementById('pdf-athlete-id').value : null;
   if (planTarget === 'individual' && !athleteId) { showToast('Seleccioná un alumno', 'error'); return; }
+
+  showPdfStatus('loading', '<span class="spin">⟳</span> Subiendo...');
+
+  const safeName = selectedPlanFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const path = `${currentAthlete.id}/${Date.now()}-${safeName}`;
+
+  const { error: uploadError } = await sb.storage.from(PLAN_PDF_BUCKET).upload(path, selectedPlanFile, {
+    contentType: 'application/pdf'
+  });
+  if (uploadError) { showPdfStatus('error', '✕ Error al subir: ' + uploadError.message); return; }
+
+  const { data: { publicUrl } } = sb.storage.from(PLAN_PDF_BUCKET).getPublicUrl(path);
 
   const { error } = await sb.from('training_plans').insert({
     coach_id: currentAthlete.id,
     title,
     target: planTarget,
     athlete_id: athleteId || null,
-    weeks: parsedPlanData.weeks,
+    file_url: publicUrl,
+    file_path: path,
     active: true
   });
 
-  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  if (error) { showPdfStatus('error', '✕ Error al guardar: ' + error.message); return; }
 
   // Notificar
   if (planTarget === 'group') {
@@ -5274,15 +5285,16 @@ async function savePlanFromPdf() {
 }
 
 function resetPlanModal() {
-  parsedPlanData = null; planTarget = 'group';
+  selectedPlanFile = null; planTarget = 'group';
   document.getElementById('pdf-file-input').value = '';
   document.getElementById('pdf-file-name').style.display = 'none';
   document.getElementById('pdf-drop-hint').style.display = '';
   document.getElementById('pdf-status').classList.add('hidden');
   document.getElementById('pdf-plan-preview').style.display = 'none';
+  document.getElementById('pdf-plan-preview').innerHTML = '';
   document.getElementById('pdf-title-group').style.display = 'none';
   document.getElementById('pdf-target-group').style.display = 'none';
-  document.getElementById('btn-save-plan').style.display = 'none';
+  document.getElementById('btn-save-plan-pdf').style.display = 'none';
   setPlanTarget('group');
 }
 
