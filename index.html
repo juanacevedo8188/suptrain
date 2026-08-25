@@ -1151,6 +1151,11 @@ tbody tr:hover td{background:var(--accent-dim);color:var(--text);}
         </div>
         <div id="plan-athlete-multiselect" style="display:none;flex-wrap:wrap;gap:6px" class="flex"></div>
       </div>
+      <!-- Planes en PDF asignados (compacto, ver completo en "Mis planes") -->
+      <div id="plan-pdf-attachments" style="display:none;margin-bottom:20px">
+        <div class="card-title">📋 Plan cargado en PDF</div>
+        <div id="plan-pdf-attachments-list"></div>
+      </div>
       <!-- Grilla 7 días -->
       <div class="calendar-grid" id="calendar-grid"></div>
     </div>
@@ -4615,6 +4620,7 @@ async function loadPlan() {
   }
   currentPlanData.days = days;
   renderCalendar(currentWeekStart, days, isCoach);
+  loadPlanPdfAttachments();
 }
 
 function renderCalendar(monday, days, isCoach) {
@@ -5111,10 +5117,8 @@ let selectedPlanFile = null;
 let planTarget = 'group';
 const PLAN_PDF_BUCKET = 'plan-pdfs';
 
-async function loadMyPlans() {
-  if (!currentAthlete) return;
+async function fetchMyPlans() {
   const isCoach = currentAthlete.roles?.includes('coach');
-
   let query = sb.from('training_plans')
     .select('*, athlete:athlete_id(name)')
     .eq('active', true)
@@ -5124,16 +5128,22 @@ async function loadMyPlans() {
     ? query.eq('coach_id', currentAthlete.id)
     : query.or(`target.eq.group,athlete_id.eq.${currentAthlete.id}`);
 
-  const { data: plans } = await query;
+  const { data } = await query;
+  return data || [];
+}
 
-  document.getElementById('btn-upload-plan').style.display = isCoach ? '' : 'none';
+// Dibuja la lista de planes PDF en cualquier contenedor (se usa tanto en
+// "Mis planes" como, compacto, arriba de la grilla de "Plan semanal").
+function renderPlansList(containerId, plans, { emptyState = true } = {}) {
+  const isCoach = currentAthlete.roles?.includes('coach');
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-  const container = document.getElementById('myplans-list');
-  if (!plans?.length) {
-    container.innerHTML = `<div class="empty-state" style="padding:48px">
+  if (!plans.length) {
+    container.innerHTML = emptyState ? `<div class="empty-state" style="padding:48px">
       <p>${isCoach ? 'Todavía no cargaste ningún plan' : 'Todavía no tenés planes cargados'}</p>
       ${isCoach ? `<button class="btn btn-primary" onclick="openModal('modal-upload-plan')" style="margin-top:12px">Cargar primer plan</button>` : ''}
-    </div>`;
+    </div>` : '';
     return;
   }
 
@@ -5159,8 +5169,24 @@ async function loadMyPlans() {
   // Render del thumbnail (1ra página) de cada plan, sin bloquear el render de la lista
   plans.forEach((p, i) => {
     const el = container.children[i]?.querySelector('.plan-thumb');
-    if (el && p.file_url) renderPdfPreview(p.file_url, el, { maxPages: 1, scale: 0.6 });
+    if (el && p.file_url) renderPdfPreview(p.file_url, el, { maxPages: 1, scale: 0.6, minWidthPx: null });
   });
+}
+
+async function loadMyPlans() {
+  if (!currentAthlete) return;
+  const isCoach = currentAthlete.roles?.includes('coach');
+  document.getElementById('btn-upload-plan').style.display = isCoach ? '' : 'none';
+  renderPlansList('myplans-list', await fetchMyPlans());
+}
+
+// Versión compacta de "Mis planes", mostrada directo arriba de la grilla en "Plan semanal"
+async function loadPlanPdfAttachments() {
+  if (!currentAthlete) return;
+  const plans = await fetchMyPlans();
+  const section = document.getElementById('plan-pdf-attachments');
+  if (section) section.style.display = plans.length ? '' : 'none';
+  renderPlansList('plan-pdf-attachments-list', plans, { emptyState: false });
 }
 
 async function openPlanViewer(fileUrl, title) {
@@ -5170,22 +5196,32 @@ async function openPlanViewer(fileUrl, title) {
   await renderPdfPreview(fileUrl, document.getElementById('view-plan-pages'), { scale: 1.4 });
 }
 
-// Renderiza un PDF (URL remota o ArrayBuffer local) como imágenes dentro de un contenedor
+// Renderiza un PDF (URL remota o ArrayBuffer local) como imágenes dentro de un contenedor.
+// El canvas se muestra a width:100% del contenedor, así que si lo renderizamos a baja
+// resolución interna el navegador lo estira y se ve borroso — por eso garantizamos un
+// mínimo de píxeles reales (ajustado por devicePixelRatio) salvo que sea un thumbnail chico.
 async function renderPdfPreview(source, container, opts = {}) {
   container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:.8rem">Cargando…</div>';
   try {
     const loadingTask = typeof source === 'string' ? pdfjsLib.getDocument(source) : pdfjsLib.getDocument({ data: source });
     const pdf = await loadingTask.promise;
     container.innerHTML = '';
-    const scale = opts.scale || 1.3;
     const numPages = opts.maxPages ? Math.min(opts.maxPages, pdf.numPages) : pdf.numPages;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const minWidthPx = opts.minWidthPx ?? 1600;
+
     for (let i = 1; i <= numPages; i++) {
       const page = await pdf.getPage(i);
+      let scale = opts.scale || 1.3;
+      if (opts.minWidthPx !== null) {
+        const baseWidth = page.getViewport({ scale: 1 }).width;
+        scale = Math.max(scale, minWidthPx / baseWidth) * dpr;
+      }
       const viewport = page.getViewport({ scale });
       const canvas = document.createElement('canvas');
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      canvas.style.cssText = 'width:100%;display:block;border-radius:var(--r);margin-bottom:8px';
+      canvas.style.cssText = 'width:100%;height:auto;display:block;border-radius:var(--r);margin-bottom:8px';
       await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
       container.appendChild(canvas);
     }
