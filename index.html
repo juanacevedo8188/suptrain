@@ -1128,9 +1128,6 @@ tbody tr:hover td{background:var(--accent-dim);color:var(--text);}
     <div id="page-plan" class="hidden">
       <div class="page-header flex between wrap gap12">
         <div><div class="page-title">PLAN SEMANAL</div><div class="page-subtitle" id="plan-subtitle">Semana actual</div></div>
-        <button class="btn btn-primary" id="btn-save-plan" onclick="savePlan()" style="display:none">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Guardar plan
-        </button>
       </div>
       <!-- Navegación de semanas -->
       <div class="week-nav">
@@ -1140,13 +1137,19 @@ tbody tr:hover td{background:var(--accent-dim);color:var(--text);}
         <button class="btn btn-secondary btn-sm" onclick="goToCurrentWeek()">Hoy</button>
       </div>
       <!-- Selector destinatario (coach) -->
-      <div id="plan-target-row" style="display:none;margin-bottom:16px" class="flex gap12 wrap">
-        <div style="display:flex;align-items:center;gap:8px">
-          <label class="form-label" style="margin:0;white-space:nowrap">Ver plan de:</label>
-          <select class="form-control" id="plan-athlete-select" style="width:auto" onchange="loadPlan()">
-            <option value="group">Todo el grupo</option>
-          </select>
+      <div id="plan-target-row" style="display:none;margin-bottom:16px">
+        <div class="form-label" style="margin-bottom:8px">Ver / asignar plan a:</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <button class="plan-athlete-pill selected" id="plan-target-group-btn" onclick="setPlanViewTarget('group')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            Todo el grupo
+          </button>
+          <button class="plan-athlete-pill" id="plan-target-custom-btn" onclick="setPlanViewTarget('custom')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Atleta(s) específico(s)
+          </button>
         </div>
+        <div id="plan-athlete-multiselect" style="display:none;flex-wrap:wrap;gap:6px" class="flex"></div>
       </div>
       <!-- Grilla 7 días -->
       <div class="calendar-grid" id="calendar-grid"></div>
@@ -2387,7 +2390,6 @@ function applyRoles() {
   document.getElementById('nav-admin').style.display = isAdmin() ? '' : 'none';
   document.getElementById('nav-plan').style.display = '';  // visible para todos
   document.getElementById('nav-myplans').style.display = '';  // visible para todos (coach carga, alumno ve)
-  document.getElementById('btn-save-plan').style.display = isCoach ? '' : 'none';
   document.getElementById('plan-target-row').style.display = isCoach ? '' : 'none';
 }
 
@@ -4495,6 +4497,30 @@ function prTypeLabel(t) {
 let currentWeekStart = null;
 let currentPlanData = { plan: null, days: [] };
 let planWorkouts = [];
+let planViewMode = 'group'; // 'group' | 'custom'
+let planViewAthleteIds = [];
+let planAllAthletes = [];
+
+function setPlanViewTarget(mode) {
+  planViewMode = mode;
+  document.getElementById('plan-target-group-btn').classList.toggle('selected', mode === 'group');
+  document.getElementById('plan-target-custom-btn').classList.toggle('selected', mode === 'custom');
+  document.getElementById('plan-athlete-multiselect').style.display = mode === 'custom' ? 'flex' : 'none';
+  loadPlan();
+}
+
+function togglePlanAthlete(id) {
+  const idx = planViewAthleteIds.indexOf(id);
+  if (idx === -1) planViewAthleteIds.push(id); else planViewAthleteIds.splice(idx, 1);
+  renderPlanAthleteMultiselect();
+  loadPlan();
+}
+
+function renderPlanAthleteMultiselect() {
+  document.getElementById('plan-athlete-multiselect').innerHTML = planAllAthletes.map(a => `
+    <button class="plan-athlete-pill${planViewAthleteIds.includes(a.id) ? ' selected' : ''}" onclick="togglePlanAthlete('${a.id}')">${a.name}</button>
+  `).join('');
+}
 
 function getMonday(date) {
   const d = new Date(date);
@@ -4543,28 +4569,21 @@ async function loadPlan() {
       o.value = w.id; o.textContent = `${wtLabels[w.type] || w.type} · ${w.title}`;
       sel.appendChild(o);
     });
-    // Llenar selector de atletas
-    const { data: aths } = await sb.from('athletes').select('id,name').order('name');
-    const asel = document.getElementById('plan-athlete-select');
-    asel.innerHTML = '<option value="group">Todo el grupo</option>';
-    (aths||[]).forEach(a => {
-      const o = document.createElement('option'); o.value = a.id; o.textContent = a.name; asel.appendChild(o);
-    });
+    // Llenar selector múltiple de atletas
+    const { data: aths } = await sb.from('athletes').select('id,name').eq('active', true).neq('id', currentAthlete.id).order('name');
+    planAllAthletes = aths || [];
+    renderPlanAthleteMultiselect();
   }
 
-  // Determinar target
-  const targetVal = isCoach
-    ? (document.getElementById('plan-athlete-select')?.value || 'group')
-    : 'group'; // atleta siempre ve el plan grupal por defecto
-  const isGroup = targetVal === 'group';
+  const isGroup = !isCoach || planViewMode === 'group';
 
   // Buscar plan existente para esta semana
-  // Un atleta puede tener plan grupal O plan individual — buscar ambos
+  // Un atleta puede tener plan grupal O un plan que lo incluya en su lista de atletas — buscar ambos
   let plans = null;
   if (!isCoach) {
-    // Primero buscar plan individual, si no existe buscar el grupal
+    // Primero buscar un plan que incluya a este atleta, si no existe buscar el grupal
     const { data: indPlan } = await sb.from('weekly_plans').select('*')
-      .eq('week_start', weekStr).eq('target','individual').eq('athlete_id', currentAthlete.id).maybeSingle();
+      .eq('week_start', weekStr).eq('target','individual').contains('athlete_ids', [currentAthlete.id]).maybeSingle();
     if (indPlan) {
       plans = indPlan;
     } else {
@@ -4572,11 +4591,15 @@ async function loadPlan() {
         .eq('week_start', weekStr).eq('target','group').maybeSingle();
       plans = grpPlan || null;
     }
-  } else {
-    let planQuery = sb.from('weekly_plans').select('*').eq('week_start', weekStr);
-    if (isGroup) planQuery = planQuery.eq('target','group');
-    else planQuery = planQuery.eq('athlete_id', targetVal);
-    const { data: p } = await planQuery.maybeSingle();
+  } else if (isGroup) {
+    const { data: p } = await sb.from('weekly_plans').select('*').eq('week_start', weekStr).eq('target','group').maybeSingle();
+    plans = p || null;
+  } else if (planViewAthleteIds.length) {
+    // Match exacto del conjunto de atletas seleccionado (mismo mesociclo = mismo plan)
+    const { data: p } = await sb.from('weekly_plans').select('*')
+      .eq('week_start', weekStr).eq('target','individual')
+      .contains('athlete_ids', planViewAthleteIds).containedBy('athlete_ids', planViewAthleteIds)
+      .maybeSingle();
     plans = p || null;
   }
   currentPlanData.plan = plans || null;
@@ -4708,21 +4731,28 @@ async function savePlanDay() {
   // Crear plan si no existe
   let planId = currentPlanData.plan?.id;
   if (!planId) {
+    const isGroup = planViewMode === 'group';
+    if (!isGroup && !planViewAthleteIds.length) { showToast('Seleccioná al menos un alumno', 'error'); return; }
+
     const weekStr = currentWeekStart.toISOString().split('T')[0];
-    const targetVal = document.getElementById('plan-athlete-select')?.value || 'group';
-    const isGroup = targetVal === 'group';
     const { data: newPlan, error } = await sb.from('weekly_plans').insert({
       coach_id: currentAthlete.id,
       week_start: weekStr,
       target: isGroup ? 'group' : 'individual',
-      athlete_id: isGroup ? null : targetVal,
+      athlete_ids: isGroup ? null : planViewAthleteIds,
     }).select().single();
     if (error) { showToast('Error: ' + error.message, 'error'); return; }
     currentPlanData.plan = newPlan;
     planId = newPlan.id;
 
-    // Notificar atletas si es plan grupal
-    if (isGroup) await notifyAllAthletes('new_plan', '📅 Plan semanal actualizado', `El coach cargó el plan de la semana del ${weekLabel(currentWeekStart)}`, 'plan');
+    // Notificar
+    if (isGroup) {
+      await notifyAllAthletes('new_plan', '📅 Plan semanal actualizado', `El coach cargó el plan de la semana del ${weekLabel(currentWeekStart)}`, 'plan');
+    } else {
+      for (const aid of planViewAthleteIds) {
+        await sb.from('notifications').insert({ athlete_id: aid, type:'new_plan', title:'📅 Plan semanal actualizado', body:`El coach cargó tu plan de la semana del ${weekLabel(currentWeekStart)}`, link_page:'plan', read:false });
+      }
+    }
   }
 
   const coachNotes = document.getElementById('pd-coach-notes').value || null;
@@ -4987,10 +5017,6 @@ async function removePlanDay(dayId) {
   await sb.from('plan_days').delete().eq('id', dayId);
   showToast('Quitado', 'success');
   await loadPlan();
-}
-
-async function savePlan() {
-  showToast('Plan guardado ✓', 'success');
 }
 
 // ── NOTIFICACIONES ──
