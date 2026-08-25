@@ -12,15 +12,22 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'No PDF data received' }) };
     }
 
-    const prompt = `Este es un plan de entrenamiento deportivo. Extraé todas las semanas y días.
+    const prompt = `Este es un plan de entrenamiento de SUP (stand up paddle) de alto rendimiento, típicamente exportado desde una planilla de cálculo a PDF. Extraé todas las semanas y días.
 Respondé ÚNICAMENTE con este JSON (sin texto antes ni después):
 
 {"title":"nombre del plan","weeks":[{"week_number":1,"days":[{"day_index":0,"type":"agua","title":"título corto","description":"instrucciones completas"}]}]}
 
-Reglas:
-- day_index: 0=Lunes, 1=Martes, 2=Miércoles, 3=Jueves, 4=Viernes, 5=Sábado, 6=Domingo  
+Cómo leer la tabla:
+- Es una tabla ancha con una fila por semana y una columna por día (Lunes a Domingo). Puede haber columnas extra tipo "Sábados Plus" / "Domingo Plus" para actividad opcional: tratalas como día_index 5 y 6.
+- Algunas celdas tienen texto rotado 90° (una letra por línea, de arriba hacia abajo, ej: "M O V O G Y M S U A V E"). Leelo como una palabra normal ("MOVILIDAD O GYM SUAVE") y usalo como parte del título o descripción del día al que corresponde esa columna/bloque, no como un día aparte.
+- Una celda puede estar fusionada y abarcar varias filas o aplicar a varios días de la semana: repetí su contenido en cada día al que corresponda.
+- Si una columna está vacía o es solo un separador visual, omitila (no generes un día para ella).
+- Texto suelto fuera de la grilla (frases motivacionales, notas al margen) no es un entrenamiento: ignoralo salvo que claramente sea instrucción para un día puntual.
+
+Reglas de formato:
+- day_index: 0=Lunes, 1=Martes, 2=Miércoles, 3=Jueves, 4=Viernes, 5=Sábado, 6=Domingo
 - type: agua/tierra/gym/descanso/competencia
-- description: copiá las instrucciones exactas del PDF
+- description: copiá las instrucciones del PDF para ese día, ya desenredadas de la rotación/fusión de celdas
 - Si no hay actividad un día, omitilo del array
 - SOLO JSON, nada más`;
 
