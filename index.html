@@ -11,8 +11,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
-<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';</script>
 <style>
 :root{
   --bg:#0a0e14;--bg2:#111720;--bg3:#181f2b;--surface:#1e2735;--surface2:#252e3f;
@@ -1946,8 +1944,8 @@ tbody tr:hover td{background:var(--accent-dim);color:var(--text);}
 
       <div id="pdf-status" class="watch-import-status hidden" style="margin-top:10px"></div>
 
-      <!-- Preview del PDF como imagen -->
-      <div id="pdf-plan-preview" style="display:none;margin-top:16px;max-height:280px;overflow-y:auto;background:var(--bg3);border-radius:var(--r);padding:8px"></div>
+      <!-- Preview del PDF (visor nativo del navegador) -->
+      <div id="pdf-plan-preview" style="display:none;margin-top:16px"></div>
 
       <!-- Título del plan -->
       <div class="form-group" id="pdf-title-group" style="display:none;margin-top:14px">
@@ -1965,14 +1963,12 @@ tbody tr:hover td{background:var(--accent-dim);color:var(--text);}
           </button>
           <button class="plan-athlete-pill" id="target-individual-btn" onclick="setPlanTarget('individual')">
             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            Alumno específico
+            Alumno(s) específico(s)
           </button>
         </div>
         <div id="athlete-selector" style="display:none">
-          <div class="form-label" style="margin-bottom:6px">Seleccioná el alumno</div>
-          <select class="form-control" id="pdf-athlete-id">
-            <option value="">— seleccionar —</option>
-          </select>
+          <div class="form-label" style="margin-bottom:6px">Seleccioná el/los alumno(s)</div>
+          <div id="pdf-athlete-multiselect" style="display:flex;flex-wrap:wrap;gap:6px"></div>
         </div>
       </div>
     </div>
@@ -5114,22 +5110,33 @@ async function notifyWorkoutCreated(workoutTitle, target, athleteId) {
 
 // ── PLANES PERSONALIZADOS (PDF subido tal cual, sin IA) ──
 let selectedPlanFile = null;
+let selectedPlanFileUrl = null; // object URL del preview local, se revoca al cerrar
 let planTarget = 'group';
+let pdfAllAthletes = [];
+let pdfSelectedAthleteIds = [];
 const PLAN_PDF_BUCKET = 'plan-pdfs';
 
 async function fetchMyPlans() {
   const isCoach = currentAthlete.roles?.includes('coach');
   let query = sb.from('training_plans')
-    .select('*, athlete:athlete_id(name)')
+    .select('*')
     .eq('active', true)
     .order('created_at', { ascending: false });
 
   query = isCoach
     ? query.eq('coach_id', currentAthlete.id)
-    : query.or(`target.eq.group,athlete_id.eq.${currentAthlete.id}`);
+    : query.or(`target.eq.group,athlete_ids.cs.{${currentAthlete.id}}`);
 
   const { data } = await query;
-  return data || [];
+  const plans = data || [];
+
+  // Resolver nombres de los atletas asignados (no se puede hacer join directo sobre un array)
+  if (plans.some(p => p.athlete_ids?.length)) {
+    const { data: aths } = await sb.from('athletes').select('id,name');
+    const nameMap = Object.fromEntries((aths || []).map(a => [a.id, a.name]));
+    plans.forEach(p => { p._athleteNames = (p.athlete_ids || []).map(id => nameMap[id] || '?').join(', '); });
+  }
+  return plans;
 }
 
 // Dibuja la lista de planes PDF en cualquier contenedor (se usa tanto en
@@ -5152,25 +5159,18 @@ function renderPlansList(containerId, plans, { emptyState = true } = {}) {
         <div>
           <div style="font-weight:600;font-size:.95rem">${p.title}</div>
           <div style="font-size:.75rem;color:var(--text3);margin-top:3px">
-            ${p.target === 'group' ? '👥 Todo el grupo' : `👤 ${p.athlete?.name || 'Alumno específico'}`}
+            ${p.target === 'group' ? '👥 Todo el grupo' : `👤 ${p._athleteNames || 'Alumno(s) específico(s)'}`}
             · ${new Date(p.created_at).toLocaleDateString('es-AR')}
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
-          <button class="btn btn-sm btn-ghost" onclick="openPlanViewer('${p.file_url}','${(p.title||'').replace(/'/g,"\\'")}')">Ver completo</button>
+          <button class="btn btn-sm btn-primary" onclick="openPlanViewer('${p.file_url}','${(p.title||'').replace(/'/g,"\\'")}')">Ver PDF</button>
           ${isCoach ? `<button class="btn-icon danger" onclick="deletePlan('${p.id}')">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
           </button>` : ''}
         </div>
       </div>
-      <div class="plan-thumb" style="cursor:pointer;background:var(--bg3);border-radius:var(--r);overflow:hidden" onclick="openPlanViewer('${p.file_url}','${(p.title||'').replace(/'/g,"\\'")}')"></div>
     </div>`).join('');
-
-  // Render del thumbnail (1ra página) de cada plan, sin bloquear el render de la lista
-  plans.forEach((p, i) => {
-    const el = container.children[i]?.querySelector('.plan-thumb');
-    if (el && p.file_url) renderPdfPreview(p.file_url, el, { maxPages: 1, scale: 0.6, minWidthPx: null });
-  });
 }
 
 async function loadMyPlans() {
@@ -5189,46 +5189,12 @@ async function loadPlanPdfAttachments() {
   renderPlansList('plan-pdf-attachments-list', plans, { emptyState: false });
 }
 
-async function openPlanViewer(fileUrl, title) {
+function openPlanViewer(fileUrl, title) {
   document.getElementById('view-plan-title').textContent = title || 'Plan';
   document.getElementById('view-plan-download').href = fileUrl;
+  document.getElementById('view-plan-pages').innerHTML =
+    `<iframe src="${fileUrl}" style="width:100%;height:70vh;border:none;border-radius:var(--r);background:#fff"></iframe>`;
   openModal('modal-view-plan');
-  await renderPdfPreview(fileUrl, document.getElementById('view-plan-pages'), { scale: 1.4 });
-}
-
-// Renderiza un PDF (URL remota o ArrayBuffer local) como imágenes dentro de un contenedor.
-// El canvas se muestra a width:100% del contenedor, así que si lo renderizamos a baja
-// resolución interna el navegador lo estira y se ve borroso — por eso garantizamos un
-// mínimo de píxeles reales (ajustado por devicePixelRatio) salvo que sea un thumbnail chico.
-async function renderPdfPreview(source, container, opts = {}) {
-  container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:.8rem">Cargando…</div>';
-  try {
-    const loadingTask = typeof source === 'string' ? pdfjsLib.getDocument(source) : pdfjsLib.getDocument({ data: source });
-    const pdf = await loadingTask.promise;
-    container.innerHTML = '';
-    const numPages = opts.maxPages ? Math.min(opts.maxPages, pdf.numPages) : pdf.numPages;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const minWidthPx = opts.minWidthPx ?? 1600;
-
-    for (let i = 1; i <= numPages; i++) {
-      const page = await pdf.getPage(i);
-      let scale = opts.scale || 1.3;
-      if (opts.minWidthPx !== null) {
-        const baseWidth = page.getViewport({ scale: 1 }).width;
-        scale = Math.max(scale, minWidthPx / baseWidth) * dpr;
-      }
-      const viewport = page.getViewport({ scale });
-      const canvas = document.createElement('canvas');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      canvas.style.cssText = 'width:100%;height:auto;display:block;border-radius:var(--r);margin-bottom:8px';
-      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-      container.appendChild(canvas);
-    }
-  } catch (err) {
-    console.error('PDF render error:', err);
-    container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--danger);font-size:.8rem">No se pudo mostrar la vista previa.</div>`;
-  }
 }
 
 async function deletePlan(id) {
@@ -5263,30 +5229,38 @@ async function handlePlanPdf(file) {
   document.getElementById('pdf-file-name').textContent = file.name;
   document.getElementById('pdf-file-name').style.display = 'block';
   document.getElementById('pdf-drop-hint').style.display = 'none';
-  showPdfStatus('loading', '<span class="spin">⟳</span> Generando vista previa...');
 
-  try {
-    const buffer = await file.arrayBuffer();
-    const previewEl = document.getElementById('pdf-plan-preview');
-    previewEl.style.display = 'block';
-    await renderPdfPreview(buffer, previewEl, { scale: 1 });
+  // Vista previa con el visor nativo del navegador (más robusto que dibujarlo nosotros)
+  if (selectedPlanFileUrl) URL.revokeObjectURL(selectedPlanFileUrl);
+  selectedPlanFileUrl = URL.createObjectURL(file);
+  const previewEl = document.getElementById('pdf-plan-preview');
+  previewEl.style.display = 'block';
+  previewEl.innerHTML = `<iframe src="${selectedPlanFileUrl}" style="width:100%;height:320px;border:none;border-radius:var(--r);background:#fff"></iframe>`;
 
-    document.getElementById('pdf-title-group').style.display = 'block';
-    document.getElementById('pdf-plan-title').value = file.name.replace(/\.pdf$/i, '');
-    document.getElementById('pdf-target-group').style.display = 'block';
-    document.getElementById('btn-save-plan-pdf').style.display = '';
+  document.getElementById('pdf-title-group').style.display = 'block';
+  document.getElementById('pdf-plan-title').value = file.name.replace(/\.pdf$/i, '');
+  document.getElementById('pdf-target-group').style.display = 'block';
+  document.getElementById('btn-save-plan-pdf').style.display = '';
 
-    // Cargar atletas en el selector
-    const { data: athletes } = await sb.from('athletes').select('id,name').eq('active', true).neq('id', currentAthlete.id);
-    const sel = document.getElementById('pdf-athlete-id');
-    sel.innerHTML = '<option value="">— seleccionar —</option>' +
-      (athletes || []).map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+  // Cargar atletas en el multiselect
+  const { data: athletes } = await sb.from('athletes').select('id,name').eq('active', true).neq('id', currentAthlete.id).order('name');
+  pdfAllAthletes = athletes || [];
+  pdfSelectedAthleteIds = [];
+  renderPdfAthleteMultiselect();
 
-    showPdfStatus('success', '✓ Listo — revisá y guardá');
-  } catch(err) {
-    console.error('PDF error:', err);
-    showPdfStatus('error', '✕ Error: ' + (err.message || 'desconocido'));
-  }
+  showPdfStatus('success', '✓ Listo — revisá y guardá');
+}
+
+function renderPdfAthleteMultiselect() {
+  document.getElementById('pdf-athlete-multiselect').innerHTML = pdfAllAthletes.map(a => `
+    <button class="plan-athlete-pill${pdfSelectedAthleteIds.includes(a.id) ? ' selected' : ''}" onclick="togglePdfAthlete('${a.id}')">${a.name}</button>
+  `).join('');
+}
+
+function togglePdfAthlete(id) {
+  const idx = pdfSelectedAthleteIds.indexOf(id);
+  if (idx === -1) pdfSelectedAthleteIds.push(id); else pdfSelectedAthleteIds.splice(idx, 1);
+  renderPdfAthleteMultiselect();
 }
 
 function showPdfStatus(type, msg) {
@@ -5306,8 +5280,7 @@ function setPlanTarget(target) {
 async function savePlanFromPdf() {
   if (!selectedPlanFile || !currentAthlete) return;
   const title = document.getElementById('pdf-plan-title').value.trim() || 'Plan sin nombre';
-  const athleteId = planTarget === 'individual' ? document.getElementById('pdf-athlete-id').value : null;
-  if (planTarget === 'individual' && !athleteId) { showToast('Seleccioná un alumno', 'error'); return; }
+  if (planTarget === 'individual' && !pdfSelectedAthleteIds.length) { showToast('Seleccioná al menos un alumno', 'error'); return; }
 
   showPdfStatus('loading', '<span class="spin">⟳</span> Subiendo...');
 
@@ -5325,7 +5298,7 @@ async function savePlanFromPdf() {
     coach_id: currentAthlete.id,
     title,
     target: planTarget,
-    athlete_id: athleteId || null,
+    athlete_ids: planTarget === 'individual' ? pdfSelectedAthleteIds : null,
     file_url: publicUrl,
     file_path: path,
     active: true
@@ -5336,8 +5309,10 @@ async function savePlanFromPdf() {
   // Notificar
   if (planTarget === 'group') {
     await notifyAllAthletes('new_plan', '📋 Nuevo plan disponible', `El coach publicó: ${title}`, 'myplans');
-  } else if (athleteId) {
-    await sb.from('notifications').insert({ athlete_id: athleteId, type:'new_plan', title:'📋 Nuevo plan', body:`El coach publicó un plan para vos: ${title}`, link_page:'myplans', read:false });
+  } else {
+    for (const aid of pdfSelectedAthleteIds) {
+      await sb.from('notifications').insert({ athlete_id: aid, type:'new_plan', title:'📋 Nuevo plan', body:`El coach publicó un plan para vos: ${title}`, link_page:'myplans', read:false });
+    }
   }
 
   closeModal('modal-upload-plan');
@@ -5347,7 +5322,8 @@ async function savePlanFromPdf() {
 }
 
 function resetPlanModal() {
-  selectedPlanFile = null; planTarget = 'group';
+  selectedPlanFile = null; planTarget = 'group'; pdfSelectedAthleteIds = [];
+  if (selectedPlanFileUrl) { URL.revokeObjectURL(selectedPlanFileUrl); selectedPlanFileUrl = null; }
   document.getElementById('pdf-file-input').value = '';
   document.getElementById('pdf-file-name').style.display = 'none';
   document.getElementById('pdf-drop-hint').style.display = '';
