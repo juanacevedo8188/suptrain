@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f3f96">
+<title>Lavando · Estado de máquinas</title>
+<meta name="description" content="Mirá desde el celular cuánto le falta a tu lavarropas o secadora en Lavando Rosario.">
+<style>
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --ink:#1b2140; --muted:#6b7394; --line:#e3e7f2;
+  --brand:#2f3f96; --brand-2:#e2358a; --dot-1:#e2358a; --dot-2:#8b4bd1; --dot-3:#2fb36b;
+  --ok:#23884a; --ok-bg:#e5f5ea; --busy:#c62839; --busy-bg:#fde8ea;
+  --warn:#d9480f; --warn-bg:#fff0e6; --err:#9c1c2c; --err-bg:#fbe3e6;
+  --shadow:0 1px 2px rgba(20,30,70,.06),0 6px 20px rgba(20,30,70,.06);
+  --r:18px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1224; --card:#181c33; --ink:#eef0fa; --muted:#9aa2c4; --line:#2a3052;
+    --brand:#8fa0ff; --ok:#5fd28a; --ok-bg:#15301f; --busy:#ff6b7a; --busy-bg:#3a1820;
+    --warn:#ff9a5c; --warn-bg:#3a2414; --err:#ff7b8a; --err-bg:#3a1820;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1224; --card:#181c33; --ink:#eef0fa; --muted:#9aa2c4; --line:#2a3052;
+  --brand:#8fa0ff; --ok:#5fd28a; --ok-bg:#15301f; --busy:#ff6b7a; --busy-bg:#3a1820;
+  --warn:#ff9a5c; --warn-bg:#3a2414; --err:#ff7b8a; --err-bg:#3a1820;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+
+/* Header */
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:12px;padding:12px 0}
+.logo{font-weight:800;font-size:26px;letter-spacing:-.5px;color:var(--brand);display:flex;align-items:flex-start}
+.logo .dots{display:inline-grid;grid-template-columns:repeat(2,5px);gap:2px;margin:3px 0 0 2px}
+.logo .dots i{width:5px;height:5px;border-radius:50%;display:block}
+.logo .dots i:nth-child(1){background:var(--dot-1)}.logo .dots i:nth-child(2){background:var(--dot-2)}
+.logo .dots i:nth-child(3){background:var(--dot-3)}.logo .dots i:nth-child(4){background:var(--dot-1);opacity:.5}
+.top .sub{color:var(--muted);font-size:13px;line-height:1.2;border-left:1px solid var(--line);padding-left:12px}
+.top .sub b{color:var(--ink);display:block;font-size:14px}
+.clock{margin-left:auto;font-weight:800;font-size:22px;font-variant-numeric:tabular-nums}
+.sedes{display:flex;gap:8px;padding:0 0 12px;overflow-x:auto;scrollbar-width:none}
+.sedes::-webkit-scrollbar{display:none}
+.sede{flex:0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);
+  font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap}
+.sede[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+:root[data-theme="dark"] .sede[aria-pressed="true"]{color:#0f1224}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sede[aria-pressed="true"]{color:#0f1224}}
+
+/* Status line */
+.live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:14px 0 10px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-weight:700;font-size:12px}
+.pill.on{background:var(--ok-bg);color:var(--ok)} .pill.demo{background:var(--warn-bg);color:var(--warn)}
+.pill.off{background:var(--err-bg);color:var(--err)}
+.pill .led{width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.on .led{animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+
+/* Tracked machine hero */
+.hero{display:none;background:linear-gradient(135deg,var(--brand),#5b3fb0);color:#fff;border-radius:22px;
+  padding:18px;margin-bottom:14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero.show{display:block}
+.hero .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;opacity:.85;font-weight:700}
+.hero .name{font-size:20px;font-weight:800;margin-top:2px}
+.hero .row{display:flex;align-items:flex-end;gap:16px;margin-top:10px;flex-wrap:wrap}
+.hero .big{font-size:56px;font-weight:900;line-height:.9;font-variant-numeric:tabular-nums}
+.hero .big small{font-size:18px;font-weight:700;margin-left:4px}
+.hero .when{font-size:15px;line-height:1.35}
+.hero .when b{font-size:22px;display:block}
+.hero .bar{height:8px;border-radius:99px;background:rgba(255,255,255,.25);margin-top:14px;overflow:hidden}
+.hero .bar i{display:block;height:100%;background:#fff;border-radius:99px;transition:width .6s}
+.hero .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.hero .actions button,.hero .actions select{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3);
+  border-radius:12px;padding:9px 12px;font-weight:700;font-size:14px;font:inherit}
+.hero .actions select option{color:#000}
+.hero .actions button.primary{background:#fff;color:var(--brand)}
+.hero .x{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:18px}
+
+/* Summary */
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 8px;text-align:center;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--muted);font-weight:600}
+.stat.g b{color:var(--ok)} .stat.r b{color:var(--busy)}
+.next{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:10px 14px;font-size:14px;margin-bottom:14px;display:none}
+.next.show{display:block}
+
+/* Filters */
+.filters{display:flex;gap:6px;margin-bottom:12px}
+.filters button{padding:7px 12px;border-radius:10px;font-size:13px;font-weight:700;color:var(--muted);background:var(--card);border:1px solid var(--line)}
+.filters button[aria-pressed="true"]{color:var(--ink);border-color:var(--ink)}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:24px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:10px;text-align:left;position:relative;transition:transform .15s}
+.card:active{transform:scale(.985)}
+.card.s-libre{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.card.s-uso{border-color:color-mix(in srgb,var(--busy) 40%,var(--line))}
+.card.s-terminando{border-color:var(--warn)}
+.card.s-error{border-color:color-mix(in srgb,var(--err) 60%,var(--line))}
+.card.tracked{outline:3px solid var(--brand);outline-offset:2px}
+.card h3{font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px}
+.card h3 .ic{font-size:18px}
+.badge{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.04em;padding:4px 9px;border-radius:8px;text-transform:uppercase}
+.s-libre .badge{background:var(--ok-bg);color:var(--ok)} .s-uso .badge{background:var(--busy-bg);color:var(--busy)}
+.s-terminando .badge{background:var(--warn-bg);color:var(--warn)} .s-error .badge{background:var(--err-bg);color:var(--err)}
+.body{display:flex;align-items:center;gap:12px;min-height:74px}
+.drum{flex:0 0 58px;height:58px;border-radius:12px;background:#1d1d24;display:grid;place-items:center;position:relative}
+.drum svg{width:36px;height:36px}
+.s-uso .drum svg,.s-terminando .drum svg{animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.drum svg{animation:none!important}}
+.info{flex:1;min-width:0}
+.mins{font-size:38px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
+.mins small{font-size:14px;font-weight:700;margin-left:2px}
+.info .t{font-size:13px;color:var(--muted);margin-top:3px}
+.info .t b{color:var(--ink)}
+.ready{font-weight:800;font-size:16px;color:var(--ok);display:flex;align-items:center;gap:6px}
+.errmsg{font-size:13px;color:var(--err);font-weight:600;line-height:1.3}
+.pbar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--busy);border-radius:99px;transition:width .6s}
+.s-terminando .pbar i{background:var(--warn)}
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);font-weight:600}
+.follow{font-size:12px;font-weight:800;color:var(--brand);padding:4px 8px;border-radius:8px;background:color-mix(in srgb,var(--brand) 12%,transparent)}
+
+.help{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:28px;font-size:14px;line-height:1.5;color:var(--muted)}
+.help h4{color:var(--ink);font-size:15px;margin-bottom:6px}
+.help ol{padding-left:18px}
+footer{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);text-align:center;padding:0 0 24px}
+
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,120px);background:var(--ink);color:var(--bg);
+  padding:12px 16px;border-radius:12px;font-weight:600;font-size:14px;transition:transform .3s,opacity .3s;z-index:50;max-width:calc(100% - 32px);opacity:0;pointer-events:none}
+.toast.show{transform:translate(-50%,0);opacity:1}
+
+@media (max-width:520px){
+  .top .sub{display:none}
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .grid{grid-template-columns:1fr 1fr;gap:10px}
+  .card{padding:12px;gap:8px}
+  .body{flex-direction:column;align-items:flex-start;min-height:0;gap:8px}
+  .drum{flex-basis:auto;width:44px;height:44px}.drum svg{width:28px;height:28px}
+  .mins{font-size:32px}
+  .card h3{font-size:16px}
+  .hero .big{font-size:48px}
+  .foot{flex-direction:column;align-items:flex-start;gap:6px}
+  .follow{align-self:stretch;text-align:center;padding:7px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="logo" aria-label="Lavando">Lavando<span class="dots"><i></i><i></i><i></i><i></i></span></div>
+      <div class="sub"><b>Estado de máquinas</b>en vivo, desde tu celu</div>
+      <div class="clock" id="clock">--:--</div>
+    </div>
+    <nav class="sedes" id="sedes" aria-label="Sede"></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="live" id="live"></div>
+
+  <section class="hero" id="hero" aria-live="polite">
+    <button class="x" id="heroClose" aria-label="Dejar de seguir">×</button>
+    <div class="lbl">Tu máquina</div>
+    <div class="name" id="heroName"></div>
+    <div class="row">
+      <div class="big" id="heroBig"></div>
+      <div class="when" id="heroWhen"></div>
+    </div>
+    <div class="bar"><i id="heroBar"></i></div>
+    <div class="actions">
+      <button class="primary" id="notifyBtn">🔔 Avisarme</button>
+      <select id="notifyLead" aria-label="Cuándo avisar">
+        <option value="0">cuando termine</option>
+        <option value="5" selected>5 min antes</option>
+        <option value="10">10 min antes</option>
+        <option value="15">15 min antes</option>
+      </select>
+      <button id="shareBtn">Compartir</button>
+    </div>
+  </section>
+
+  <section class="summary" id="summary"></section>
+  <div class="next" id="next"></div>
+
+  <div class="filters" id="filters" role="group" aria-label="Filtrar">
+    <button data-f="all" aria-pressed="true">Todas</button>
+    <button data-f="lavadora" aria-pressed="false">Lavadoras</button>
+    <button data-f="secadora" aria-pressed="false">Secadoras</button>
+  </div>
+
+  <section class="grid" id="grid"></section>
+
+  <section class="help">
+    <h4>¿Cómo se usa?</h4>
+    <ol>
+      <li>Elegí tu sede arriba.</li>
+      <li>Tocá la máquina donde pusiste tu ropa → <b>Seguir</b>.</li>
+      <li>Te mostramos a qué hora volver y, si activás <b>Avisarme</b>, te suena el celu antes de que termine.</li>
+    </ol>
+    <p style="margin-top:8px;font-size:12px">El aviso funciona mientras la página siga abierta (aunque sea en segundo plano). Los minutos se actualizan cada 30 s.</p>
+  </section>
+</main>
+
+<footer id="foot">—</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================================
+   CONFIG
+   endpoint: URL que devuelve el estado de las máquinas (la misma que consume
+   la tele del local). Por defecto pasa por el proxy de Netlify, que resuelve
+   CORS y esconde la URL real (ver netlify/functions/lavando-status.js).
+   Si el endpoint falla o no está configurado → modo DEMO (datos simulados).
+   ========================================================================= */
+const CONFIG = {
+  pollMs: 30000,
+  sedes: [
+    { id: 'zeballos',   nombre: 'Zeballos 1533',   endpoint: '/.netlify/functions/lavando-status?sede=zeballos' },
+    { id: 'montevideo', nombre: 'Montevideo 596',  endpoint: '/.netlify/functions/lavando-status?sede=montevideo' },
+  ],
+};
+
+/* ---------- utils ---------- */
+const $ = s => document.querySelector(s);
+const pad = n => String(n).padStart(2, '0');
+const hhmm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('lavando.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('lavando.' + k, JSON.stringify(v)); } catch {} },
+  del(k)    { try { localStorage.removeItem('lavando.' + k); } catch {} },
+};
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ---------- normalización de la respuesta de la API ----------
+   No conocemos el formato exacto; aceptamos variantes razonables.
+   El footer de la tele dice "proxy+MinRestEtapa", así que el campo
+   de minutos restantes probablemente se llame MinRestEtapa. */
+const pick = (o, keys) => { for (const k of keys) { if (o[k] != null && o[k] !== '') return o[k]; } return undefined; };
+const pickCI = (o, keys) => {
+  const map = {}; for (const k of Object.keys(o)) map[k.toLowerCase()] = o[k];
+  return pick(map, keys.map(k => k.toLowerCase()));
+};
+
+function normEstado(raw, mins, msg) {
+  const s = String(raw ?? '').toLowerCase();
+  if (/err|falla|fault|alarm|puerta/.test(s) || (msg && /revis/i.test(msg))) return 'error';
+  if (/termin|finish|ending|casi/.test(s)) return 'terminando';
+  if (/libre|dispon|idle|ready|free|avail|lista/.test(s)) return 'libre';
+  if (/uso|busy|run|ocup|lav|sec|in.?use|work/.test(s)) return (mins != null && mins <= 2) ? 'terminando' : 'uso';
+  if (s === '0' || s === 'false') return 'libre';
+  if (mins != null) return mins <= 0 ? 'libre' : mins <= 2 ? 'terminando' : 'uso';
+  return 'libre';
+}
+
+function normalize(payload) {
+  let list = Array.isArray(payload) ? payload
+    : pickCI(payload || {}, ['maquinas', 'machines', 'data', 'items', 'equipos', 'result', 'results']) || [];
+  if (!Array.isArray(list) && typeof list === 'object') list = Object.values(list);
+  return list.map((m, i) => {
+    const nombre = String(pickCI(m, ['nombre', 'name', 'descripcion', 'description', 'label', 'maquina']) ?? `Máquina ${i + 1}`);
+    let tipo = String(pickCI(m, ['tipo', 'type', 'kind', 'clase']) ?? nombre).toLowerCase();
+    tipo = /sec|dry/.test(tipo) ? 'secadora' : 'lavadora';
+    const minsRaw = pickCI(m, ['MinRestEtapa', 'minRestantes', 'minutosRestantes', 'remaining', 'remainingMinutes', 'minutes', 'min', 'tiempoRestante']);
+    const mins = minsRaw == null ? null : Math.max(0, Math.round(Number(minsRaw)));
+    let pct = pickCI(m, ['porcentaje', 'progreso', 'progress', 'percent', 'pct', 'avance']);
+    pct = pct == null || isNaN(Number(pct)) ? null : Number(pct);
+    if (pct != null) pct = Math.max(0, Math.min(100, pct > 0 && pct < 1 ? pct * 100 : pct)); // 0.27 → 27%
+    const msg = pickCI(m, ['mensaje', 'message', 'error', 'errorMsg', 'detalle']);
+    const estado = normEstado(pickCI(m, ['estado', 'status', 'state', 'estadoNombre']), mins, msg);
+    return {
+      id: String(pickCI(m, ['id', 'codigo', 'code', 'numero', 'nro']) ?? nombre),
+      nombre, tipo, estado,
+      mins: (estado === 'uso' || estado === 'terminando') ? mins : null,
+      pct, msg: msg ? String(msg) : null,
+      actual: pickCI(m, ['actual', 'current', 'ciclo', 'nroCiclo']) ?? null,
+      anterior: pickCI(m, ['anterior', 'previous', 'last', 'ultimo']) ?? null,
+    };
+  });
+}
+
+/* ---------- modo DEMO ----------
+   Simulación determinística (misma hora = mismo estado, aunque recargues).
+   Ciclos calibrados con la foto de la tele: 38 min ↔ 27% ⇒ ~52 min de secado;
+   15 min ↔ 70% ⇒ ~50 min de lavado. */
+function demoData(sedeId) {
+  const seed = sedeId === 'zeballos' ? 17 : 0;
+  const nowMin = Date.now() / 60000;
+  const out = [];
+  for (let n = 1; n <= 8; n++) {
+    const tipo = n % 2 ? 'secadora' : 'lavadora';
+    const ciclo = tipo === 'secadora' ? 52 : 50;
+    const periodo = ciclo + 12 + ((n * 7 + seed) % 23);        // ciclo + tiempo ocioso variable
+    const t = (nowMin + n * 13 + seed * 3) % periodo;
+    const base = 740 + n + seed;
+    if (n === 8 && sedeId === 'montevideo') {
+      out.push({ id: 'm8', nombre: 'Lavadora 8', tipo, estado: 'ERROR', MinRestEtapa: null,
+        mensaje: 'Revisá la puerta de la máquina y mantené presionado el botón durante 3 segundos.', actual: base + 4 });
+      continue;
+    }
+    if (t < ciclo) {
+      const rest = Math.ceil(ciclo - t);
+      out.push({ id: 'm' + n, nombre: `${tipo === 'secadora' ? 'Secadora' : 'Lavadora'} ${n}`, tipo,
+        estado: rest <= 2 ? 'TERMINANDO' : 'EN USO', MinRestEtapa: rest,
+        porcentaje: Math.round(t / ciclo * 100), actual: base + 10 });
+    } else {
+      out.push({ id: 'm' + n, nombre: `${tipo === 'secadora' ? 'Secadora' : 'Lavadora'} ${n}`, tipo,
+        estado: 'DISPONIBLE', MinRestEtapa: 0, anterior: base });
+    }
+  }
+  return out;
+}
+
+/* ---------- estado ---------- */
+const S = {
+  sede: store.get('sede', CONFIG.sedes[0].id),
+  filtro: store.get('filtro', 'all'),
+  tracked: store.get('tracked', null),          // {sede, id, nombre}
+  notify: store.get('notify', null),            // {sede, id, lead}
+  maquinas: [], fetchedAt: 0, modo: 'cargando', lastOk: null, error: null,
+  notified: false,
+};
+const sedeObj = () => CONFIG.sedes.find(s => s.id === S.sede) || CONFIG.sedes[0];
+
+/* minutos restantes "vivos": descuenta lo que pasó desde el último fetch */
+function liveMins(m) {
+  if (m.mins == null) return null;
+  const elapsed = (Date.now() - S.fetchedAt) / 60000;
+  return Math.max(0, Math.ceil(m.mins - elapsed));
+}
+function liveEstado(m) {
+  if (m.estado === 'uso' || m.estado === 'terminando') {
+    const r = liveMins(m);
+    if (r != null && r <= 2) return 'terminando';
+  }
+  return m.estado;
+}
+/* % vivo: duración total estimada = mins / (1 - pct/100) al momento del fetch */
+function livePct(m) {
+  if (m.pct == null || m.mins == null || m.pct >= 100) return m.pct == null ? null : Math.round(m.pct);
+  const total = m.mins / (1 - m.pct / 100);
+  return Math.round(Math.min(100, 100 * (1 - liveMins(m) / total)));
+}
+function finishAt(m) {
+  const r = liveMins(m); if (r == null) return null;
+  return new Date(Date.now() + r * 60000);
+}
+
+/* ---------- fetch ---------- */
+async function load() {
+  const sede = sedeObj();
+  let data = null;
+  if (sede.endpoint) {
+    try {
+      const ctrl = new AbortController(); const to = setTimeout(() => ctrl.abort(), 8000);
+      const r = await fetch(sede.endpoint, { signal: ctrl.signal, cache: 'no-store' });
+      clearTimeout(to);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const json = await r.json();
+      data = normalize(json);
+      if (!data.length) throw new Error('respuesta vacía');
+      S.modo = 'live'; S.lastOk = new Date(); S.error = null;
+    } catch (e) { S.error = e.message || String(e); }
+  }
+  if (!data) { data = normalize(demoData(sede.id)); S.modo = 'demo'; }
+  data.sort((a, b) => (parseInt(a.nombre.replace(/\D/g, '')) || 0) - (parseInt(b.nombre.replace(/\D/g, '')) || 0));
+  S.maquinas = data; S.fetchedAt = Date.now();
+  render();
+}
+
+/* ---------- render ---------- */
+const drumSVG = color => `<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="${color}" stroke-width="2" opacity=".5"/>
+  <g stroke="${color}" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="20" x2="20" y2="8"/><line x1="20" y1="20" x2="30.4" y2="26"/><line x1="20" y1="20" x2="9.6" y2="26"/></g>
+  <circle cx="20" cy="20" r="2.6" fill="${color}"/></svg>`;
+const BADGE = { libre: 'Disponible', uso: 'En uso', terminando: 'Terminando', error: 'Error' };
+
+function renderSedes() {
+  $('#sedes').innerHTML = CONFIG.sedes.map(s =>
+    `<button class="sede" data-sede="${s.id}" aria-pressed="${s.id === S.sede}">📍 ${s.nombre}</button>`).join('');
+}
+
+function render() {
+  const ms = S.maquinas.map(m => ({ ...m, e: liveEstado(m), r: liveMins(m) }));
+
+  // status line
+  const live = $('#live');
+  if (S.modo === 'live') live.innerHTML = `<span class="pill on"><span class="led"></span>En vivo · ${sedeObj().nombre}</span>`;
+  else if (S.modo === 'demo') live.innerHTML = `<span class="pill demo"><span class="led"></span>Modo demo</span><span>Datos simulados${S.error ? ' (API: ' + escapeHTML(S.error) + ')' : ''}</span>`;
+  else live.innerHTML = `<span class="pill off"><span class="led"></span>Cargando…</span>`;
+
+  // summary
+  const libres = ms.filter(m => m.e === 'libre');
+  const cnt = { disp: libres.length, uso: ms.filter(m => m.e === 'uso' || m.e === 'terminando').length,
+    lav: libres.filter(m => m.tipo === 'lavadora').length, sec: libres.filter(m => m.tipo === 'secadora').length };
+  $('#summary').innerHTML = `
+    <div class="stat g"><b>${cnt.disp}</b><span>Disponibles</span></div>
+    <div class="stat r"><b>${cnt.uso}</b><span>En uso</span></div>
+    <div class="stat"><b>${cnt.lav}</b><span>Lavadoras libres</span></div>
+    <div class="stat"><b>${cnt.sec}</b><span>Secadoras libres</span></div>`;
+
+  // próxima libre (cuando no hay de algún tipo)
+  const nextTxt = ['lavadora', 'secadora'].filter(t => !libres.some(m => m.tipo === t)).map(t => {
+    const cand = ms.filter(m => m.tipo === t && m.r != null).sort((a, b) => a.r - b.r)[0];
+    return cand ? `No hay ${t}s libres. La próxima se libera en <b>${cand.r} min</b> (${cand.nombre}, ~${hhmm(finishAt(cand))}).` : null;
+  }).filter(Boolean);
+  const next = $('#next'); next.innerHTML = nextTxt.join('<br>'); next.classList.toggle('show', nextTxt.length > 0);
+
+  // grid
+  const filtered = ms.filter(m => S.filtro === 'all' || m.tipo === S.filtro);
+  $('#grid').innerHTML = filtered.map(m => {
+    const tracked = S.tracked && S.tracked.sede === S.sede && S.tracked.id === m.id;
+    const color = m.e === 'libre' ? '#3ddc84' : m.e === 'error' ? '#ff5a6a' : '#ff5a6a';
+    let body;
+    if (m.e === 'libre') body = `<div class="ready">✓ Lista para usar</div>`;
+    else if (m.e === 'error') body = `<div class="errmsg">⚠ ${escapeHTML(m.msg || 'Consultá en el local.')}</div>`;
+    else {
+      const fin = finishAt(m);
+      body = `<div><div class="mins">${m.r ?? '–'}<small>min</small></div>
+        <div class="t">${m.e === 'terminando' ? '¡Casi lista!' : 'termina'} <b>~${fin ? hhmm(fin) : '--:--'}</b></div></div>`;
+    }
+    const pctShow = livePct(m);
+    const ref = m.actual != null ? `Actual: ${m.actual}` : m.anterior != null ? `Anterior: ${m.anterior}` : '';
+    const canFollow = m.e === 'uso' || m.e === 'terminando';
+    return `<div class="card s-${m.e}${tracked ? ' tracked' : ''}" data-id="${escapeHTML(m.id)}">
+      <h3><span class="ic">${m.tipo === 'secadora' ? '🌀' : '🫧'}</span>${escapeHTML(m.nombre)}</h3>
+      <span class="badge">${BADGE[m.e]}</span>
+      <div class="body"><div class="drum">${drumSVG(color)}</div><div class="info">${body}</div></div>
+      ${pctShow != null && canFollow ? `<div class="pbar"><i style="width:${pctShow}%"></i></div>` : ''}
+      <div class="foot"><span>${pctShow != null && canFollow ? pctShow + '% · ' : ''}${ref}</span>
+        ${canFollow ? `<button class="follow" data-follow="${escapeHTML(m.id)}">${tracked ? 'Siguiendo' : 'Seguir'}</button>` : ''}</div>
+    </div>`;
+  }).join('');
+
+  renderHero(ms);
+
+  $('#foot').textContent = `${S.modo === 'live' ? 'api ok' : S.modo} · ${S.lastOk ? S.lastOk.toLocaleTimeString('es-AR') : new Date(S.fetchedAt).toLocaleTimeString('es-AR')} · ${ms.length} máquinas · ${sedeObj().nombre}`;
+}
+
+function renderHero(ms) {
+  const hero = $('#hero');
+  const t = S.tracked;
+  if (!t || t.sede !== S.sede) { hero.classList.remove('show'); return; }
+  const m = ms.find(x => x.id === t.id);
+  hero.classList.add('show');
+  $('#heroName').textContent = `${t.nombre} · ${sedeObj().nombre}`;
+  if (!m) { $('#heroBig').innerHTML = '–'; $('#heroWhen').textContent = 'No encontramos la máquina.'; return; }
+  if (m.e === 'libre') {
+    $('#heroBig').innerHTML = '✓';
+    $('#heroWhen').innerHTML = `<b>¡Terminó!</b>Pasá a buscar tu ropa.`;
+    $('#heroBar').style.width = '100%';
+  } else if (m.e === 'error') {
+    $('#heroBig').innerHTML = '⚠';
+    $('#heroWhen').innerHTML = `<b>Error en la máquina</b>${escapeHTML(m.msg || '')}`;
+  } else {
+    const fin = finishAt(m);
+    $('#heroBig').innerHTML = `${m.r}<small>min</small>`;
+    $('#heroWhen').innerHTML = `Volvé a las<b>${fin ? hhmm(fin) : '--:--'}</b>`;
+    $('#heroBar').style.width = (livePct(m) ?? 0) + '%';
+  }
+  const n = S.notify && S.notify.sede === t.sede && S.notify.id === t.id;
+  $('#notifyBtn').textContent = n ? '🔕 Cancelar aviso' : '🔔 Avisarme';
+  if (n) $('#notifyLead').value = String(S.notify.lead);
+  checkNotify(m);
+}
+
+function escapeHTML(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+/* ---------- avisos ---------- */
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, .35, .7].forEach(d => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(.001, ctx.currentTime + d);
+      g.gain.exponentialRampToValueAtTime(.3, ctx.currentTime + d + .02);
+      g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + d + .25);
+      o.start(ctx.currentTime + d); o.stop(ctx.currentTime + d + .3);
+    });
+  } catch {}
+}
+function checkNotify(m) {
+  const n = S.notify;
+  if (!n || !m || n.sede !== S.sede || n.id !== m.id || S.notified) return;
+  const done = m.e === 'libre' || (m.r != null && m.r <= n.lead);
+  if (!done) return;
+  S.notified = true;
+  const txt = m.e === 'libre' ? `${m.nombre} terminó. ¡Pasá a buscar tu ropa!` : `${m.nombre} termina en ${m.r} min. ¡Salí para Lavando!`;
+  try { if ('Notification' in window && Notification.permission === 'granted') new Notification('Lavando', { body: txt, tag: 'lavando' }); } catch {}
+  if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
+  beep(); toast(txt);
+  S.notify = null; store.del('notify');
+}
+
+/* ---------- eventos ---------- */
+$('#sedes').addEventListener('click', e => {
+  const b = e.target.closest('[data-sede]'); if (!b) return;
+  S.sede = b.dataset.sede; store.set('sede', S.sede); S.modo = 'cargando';
+  renderSedes(); render(); load();
+});
+$('#filters').addEventListener('click', e => {
+  const b = e.target.closest('[data-f]'); if (!b) return;
+  S.filtro = b.dataset.f; store.set('filtro', S.filtro);
+  document.querySelectorAll('#filters button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  render();
+});
+$('#grid').addEventListener('click', e => {
+  const b = e.target.closest('[data-follow]'); if (!b) return;
+  const m = S.maquinas.find(x => x.id === b.dataset.follow); if (!m) return;
+  S.tracked = { sede: S.sede, id: m.id, nombre: m.nombre }; store.set('tracked', S.tracked);
+  S.notified = false; render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+$('#heroClose').addEventListener('click', () => {
+  S.tracked = null; S.notify = null; store.del('tracked'); store.del('notify'); render();
+});
+$('#notifyBtn').addEventListener('click', async () => {
+  const t = S.tracked; if (!t) return;
+  if (S.notify && S.notify.id === t.id) { S.notify = null; store.del('notify'); toast('Aviso cancelado'); render(); return; }
+  if ('Notification' in window && Notification.permission === 'default') { try { await Notification.requestPermission(); } catch {} }
+  S.notify = { sede: t.sede, id: t.id, lead: Number($('#notifyLead').value) }; store.set('notify', S.notify);
+  S.notified = false;
+  toast('Listo, te avisamos. Dejá esta pestaña abierta.');
+  render();
+});
+$('#notifyLead').addEventListener('change', () => {
+  if (S.notify) { S.notify.lead = Number($('#notifyLead').value); store.set('notify', S.notify); S.notified = false; render(); }
+});
+$('#shareBtn').addEventListener('click', async () => {
+  const m = S.maquinas.find(x => S.tracked && x.id === S.tracked.id);
+  const fin = m && finishAt(m);
+  const text = m && fin ? `Mi ropa en Lavando (${m.nombre}) termina a las ${hhmm(fin)}` : 'Estado de máquinas Lavando';
+  try {
+    if (navigator.share) await navigator.share({ title: 'Lavando', text, url: location.href });
+    else { await navigator.clipboard.writeText(`${text} · ${location.href}`); toast('Copiado al portapapeles'); }
+  } catch {}
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+
+/* ---------- loop ---------- */
+function tickClock() { $('#clock').textContent = hhmm(new Date()); }
+renderSedes();
+document.querySelectorAll('#filters button').forEach(x => x.setAttribute('aria-pressed', x.dataset.f === S.filtro));
+tickClock(); load();
+setInterval(tickClock, 1000);
+setInterval(() => { if (S.maquinas.length) render(); }, 15000);   // cuenta regresiva local entre polls
+setInterval(load, CONFIG.pollMs);
+</script>
+</body>
+</html>
