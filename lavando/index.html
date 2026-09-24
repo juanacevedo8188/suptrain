@@ -542,6 +542,8 @@ h2.title em{font-style:normal;color:var(--pink)}
    Si el endpoint falla o no está configurado → modo DEMO (datos simulados).
    ========================================================================= */
 const CONFIG = {
+  // false = datos de ejemplo (no intenta conectarse). Pasalo a true cuando esté configurada la API.
+  useApi: false,
   pollMs: 30000,
   sedes: [
     { id: 'zeballos',   nombre: 'Zeballos 1533',   endpoint: '/.netlify/functions/lavando-status?sede=zeballos' },
@@ -614,32 +616,39 @@ function normalize(payload) {
    Simulación determinística (misma hora = mismo estado, aunque recargues).
    Ciclos calibrados con la foto de la tele: 38 min ↔ 27% ⇒ ~52 min de secado;
    15 min ↔ 70% ⇒ ~50 min de lavado. */
+const DEMO_T0 = Date.now();
+// Escenario de ejemplo. Montevideo replica la foto de la tele del local.
+// rest = minutos restantes al abrir la página; idle = minutos libre antes de volver a arrancar.
+const DEMO = {
+  montevideo: [
+    { n: 1, rest: 38 }, { n: 2, libre: 4 }, { n: 3, rest: 8 }, { n: 4, rest: 15 },
+    { n: 5, libre: 2 }, { n: 6, rest: 1 },  { n: 7, libre: 9 }, { n: 8, error: true },
+  ],
+  zeballos: [
+    { n: 1, rest: 22 }, { n: 2, rest: 44 }, { n: 3, libre: 6 }, { n: 4, rest: 5 },
+    { n: 5, rest: 31 }, { n: 6, libre: 3 }, { n: 7, rest: 2 },  { n: 8, rest: 12 },
+  ],
+};
 function demoData(sedeId) {
-  const seed = sedeId === 'zeballos' ? 17 : 0;
-  const nowMin = Date.now() / 60000;
-  const out = [];
-  for (let n = 1; n <= 8; n++) {
-    const tipo = n % 2 ? 'secadora' : 'lavadora';
+  const since = (Date.now() - DEMO_T0) / 60000;
+  return (DEMO[sedeId] || DEMO.montevideo).map(m => {
+    const tipo = m.n % 2 ? 'secadora' : 'lavadora';
+    const nombre = `${tipo === 'secadora' ? 'Secadora' : 'Lavadora'} ${m.n}`;
     const ciclo = tipo === 'secadora' ? 52 : 50;
-    const periodo = ciclo + 12 + ((n * 7 + seed) % 23);        // ciclo + tiempo ocioso variable
-    const t = (nowMin + n * 13 + seed * 3) % periodo;
-    const base = 740 + n + seed;
-    if (n === 8 && sedeId === 'montevideo') {
-      out.push({ id: 'm8', nombre: 'Lavadora 8', tipo, estado: 'ERROR', MinRestEtapa: null,
-        mensaje: 'Revisá la puerta de la máquina y mantené presionado el botón durante 3 segundos.', actual: base + 4 });
-      continue;
-    }
+    const idle = 10 + (m.n * 7) % 15;
+    const base = 740 + m.n;
+    if (m.error) return { id: 'm' + m.n, nombre, tipo, estado: 'ERROR', actual: base + 5,
+      mensaje: 'Revisá la puerta de la máquina y mantené presionado el botón durante 3 segundos.' };
+    // posición dentro del período (ciclo + tiempo libre) al abrir la página
+    const t0 = m.libre != null ? ciclo + (idle - m.libre) : ciclo - m.rest;
+    const t = (t0 + since) % (ciclo + idle);
     if (t < ciclo) {
       const rest = Math.ceil(ciclo - t);
-      out.push({ id: 'm' + n, nombre: `${tipo === 'secadora' ? 'Secadora' : 'Lavadora'} ${n}`, tipo,
-        estado: rest <= 2 ? 'TERMINANDO' : 'EN USO', MinRestEtapa: rest,
-        porcentaje: Math.round(t / ciclo * 100), actual: base + 10 });
-    } else {
-      out.push({ id: 'm' + n, nombre: `${tipo === 'secadora' ? 'Secadora' : 'Lavadora'} ${n}`, tipo,
-        estado: 'DISPONIBLE', MinRestEtapa: 0, anterior: base });
+      return { id: 'm' + m.n, nombre, tipo, estado: rest <= 2 ? 'TERMINANDO' : 'EN USO', MinRestEtapa: rest,
+        porcentaje: Math.round(t / ciclo * 100), actual: base + 12 };
     }
-  }
-  return out;
+    return { id: 'm' + m.n, nombre, tipo, estado: 'DISPONIBLE', MinRestEtapa: 0, anterior: base };
+  });
 }
 
 /* ---------- estado ---------- */
@@ -681,7 +690,7 @@ function finishAt(m) {
 async function load() {
   const sede = sedeObj();
   let data = null;
-  if (sede.endpoint) {
+  if (CONFIG.useApi && sede.endpoint) {
     try {
       const ctrl = new AbortController(); const to = setTimeout(() => ctrl.abort(), 8000);
       const r = await fetch(sede.endpoint, { signal: ctrl.signal, cache: 'no-store' });
@@ -716,7 +725,7 @@ function render() {
   // status line
   const live = $('#live');
   if (S.modo === 'live') live.innerHTML = `<span class="pill on"><span class="led"></span>En vivo · ${sedeObj().nombre}</span>`;
-  else if (S.modo === 'demo') live.innerHTML = `<span class="pill demo"><span class="led"></span>Modo demo</span><span>Datos simulados${S.error ? ' (API: ' + escapeHTML(S.error) + ')' : ''}</span>`;
+  else if (S.modo === 'demo') live.innerHTML = `<span class="pill demo"><span class="led"></span>Datos de ejemplo</span><span>Así se va a ver con los datos reales del local${S.error ? ' (API: ' + escapeHTML(S.error) + ')' : ''}.</span>`;
   else live.innerHTML = `<span class="pill off"><span class="led"></span>Cargando…</span>`;
 
   // summary
@@ -724,7 +733,7 @@ function render() {
   const cnt = { disp: libres.length, uso: ms.filter(m => m.e === 'uso' || m.e === 'terminando').length,
     lav: libres.filter(m => m.tipo === 'lavadora').length, sec: libres.filter(m => m.tipo === 'secadora').length };
   $('#heroLive').innerHTML = S.modo === 'cargando' ? `<span class="n">–</span><b>máquinas libres</b>cargando…`
-    : `<span class="n">${cnt.disp}</span><b>máquina${cnt.disp === 1 ? ' libre' : 's libres'}</b>ahora en ${sedeObj().nombre}${S.modo === 'demo' ? ' (demo)' : ''}`;
+    : `<span class="n">${cnt.disp}</span><b>máquina${cnt.disp === 1 ? ' libre' : 's libres'}</b>ahora en ${sedeObj().nombre}${S.modo === 'demo' ? ' (ejemplo)' : ''}`;
   $('#summary').innerHTML = `
     <div class="stat g"><b>${cnt.disp}</b><span>Disponibles</span></div>
     <div class="stat r"><b>${cnt.uso}</b><span>En uso</span></div>
@@ -766,7 +775,7 @@ function render() {
 
   renderHero(ms);
 
-  $('#foot').textContent = `${S.modo === 'live' ? 'api ok' : S.modo} · ${S.lastOk ? S.lastOk.toLocaleTimeString('es-AR') : new Date(S.fetchedAt).toLocaleTimeString('es-AR')} · ${ms.length} máquinas · ${sedeObj().nombre}`;
+  $('#foot').textContent = `${S.modo === 'live' ? 'api ok' : S.modo === 'demo' ? 'ejemplo' : S.modo} · ${S.lastOk ? S.lastOk.toLocaleTimeString('es-AR') : new Date(S.fetchedAt).toLocaleTimeString('es-AR')} · ${ms.length} máquinas · ${sedeObj().nombre}`;
 }
 
 function renderHero(ms) {
