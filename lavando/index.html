@@ -274,6 +274,68 @@ h2.title em{font-style:normal;color:var(--pink)}
 .follow{font-size:12px;font-weight:900;color:var(--pink);padding:5px 10px;border-radius:8px;background:var(--pink-soft)}
 .apifoot{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);text-align:center;margin-top:14px}
 
+/* hero de máquina seguida: extras */
+.hero .sub2{font-size:13px;opacity:.9;margin-top:6px}
+.hero .links{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:13px}
+.hero .links a,.hero .links button{color:#fff;opacity:.9;text-decoration:underline;text-underline-offset:3px;font-weight:700;font-size:13px}
+.hero .actions button.wa{background:#25d366;border-color:#25d366;color:#08331a}
+.report{font-size:12px;font-weight:900;color:var(--err);padding:5px 10px;border-radius:8px;background:var(--err-bg);text-decoration:none}
+
+/* Modal WhatsApp (demo) */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(10,14,40,.55);display:none;align-items:flex-end;justify-content:center;padding:16px}
+.modal.show{display:flex}
+@media (min-width:620px){.modal{align-items:center}}
+.sheet{background:var(--card);color:var(--ink);width:100%;max-width:420px;border-radius:24px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-height:calc(100vh - 32px);overflow:auto}
+.sheet h3{font-size:20px;font-weight:900;margin-bottom:4px}
+.sheet p.m{font-size:14px;color:var(--muted);line-height:1.45}
+.sheet label{display:block;font-size:13px;font-weight:800;margin:14px 0 6px}
+.sheet .tel{display:flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
+.sheet .tel span{padding:12px;font-weight:800;color:var(--muted);border-right:1px solid var(--line)}
+.sheet .tel input{flex:1;border:0;background:transparent;padding:12px;font:inherit;font-size:16px;color:var(--ink);min-width:0}
+.sheet .chk{display:flex;gap:10px;align-items:flex-start;font-weight:600;font-size:14px;margin-top:12px}
+.sheet .chk input{margin-top:3px;width:18px;height:18px;accent-color:var(--pink)}
+.sheet .row{display:flex;gap:8px;margin-top:18px}
+.sheet .row button{flex:1;padding:13px;border-radius:12px;font-weight:900}
+.sheet .go{background:#25d366;color:#08331a}
+.sheet .cancel{background:var(--bg);border:1px solid var(--line)}
+.demo-tag{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:var(--warn-bg);color:var(--warn);padding:3px 8px;border-radius:6px;margin-bottom:10px}
+.chat{border-radius:16px;overflow:hidden;border:1px solid var(--line);margin-top:12px}
+.chat .top{background:#075e54;color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px}
+.chat .top .av{width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;color:var(--pink);font-weight:900}
+.chat .top small{display:block;font-weight:600;opacity:.8;font-size:11px}
+.chat .body{background:#e9e2d8;padding:12px;display:flex;flex-direction:column;gap:8px}
+.chat .msg{background:#fff;color:#111;border-radius:10px;border-top-left-radius:2px;padding:8px 10px 6px;font-size:14px;line-height:1.4;max-width:88%;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.chat .msg time{display:block;text-align:right;font-size:11px;color:#667;margin-top:2px}
+.chat .msg.sched{opacity:.75;border:1px dashed #9aa}
+.chat .when{align-self:center;font-size:11px;font-weight:800;background:#d9eefa;color:#345;padding:3px 8px;border-radius:6px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chat .body{background:#0b141a}}
+:root[data-theme="dark"] .chat .body{background:#0b141a}
+
+/* Horarios */
+.chartbox{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:20px;box-shadow:var(--shadow);margin-top:24px;position:relative}
+.days{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px}
+.days::-webkit-scrollbar{display:none}
+.days button{flex:0 0 auto;padding:7px 12px;border-radius:10px;font-size:13px;font-weight:800;color:var(--muted);background:var(--bg);border:1px solid var(--line)}
+.days button[aria-pressed="true"]{color:var(--ink);border-color:var(--ink)}
+.best{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.best div{font-size:14px;color:var(--muted);font-weight:700}
+.best b{color:var(--ink);font-size:18px;display:block}
+.chart{width:100%;height:auto;display:block;--bar:#4a67c9;--now:#d1206f;--gridc:var(--line)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chart{--bar:#7088f0;--now:#f0468c}}
+:root[data-theme="dark"] .chart{--bar:#7088f0;--now:#f0468c}
+.chart .b{fill:var(--bar)} .chart .b.now{fill:var(--now)}
+.chart .g{stroke:var(--gridc);stroke-width:1}
+.chart text{fill:var(--muted);font-size:11px;font-weight:700;font-family:inherit}
+.chart text.nl{fill:var(--ink);font-weight:900}
+.chart .hit{fill:transparent;cursor:pointer}
+.chart .hit:hover+.b,.chart .b.hov{opacity:.8}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;font-weight:700;padding:6px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-110%);display:none;z-index:2}
+.tip b{display:block;font-size:13px}
+.chartbox details{margin-top:10px;font-size:13px;color:var(--muted)}
+.chartbox details summary{cursor:pointer;font-weight:800}
+.chartbox table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+.chartbox td,.chartbox th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left}
+
 .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,120px);background:var(--ink);color:var(--bg);
   padding:12px 16px;border-radius:12px;font-weight:700;font-size:14px;transition:transform .3s,opacity .3s;z-index:50;
   max-width:calc(100% - 32px);opacity:0;pointer-events:none}
@@ -336,6 +398,7 @@ h2.title em{font-style:normal;color:var(--pink)}
       <li><a href="#en-vivo">Estado en vivo</a></li>
       <li><a href="#no-permitidos">Qué no lavar</a></li>
       <li><a href="#sucursales">Sedes</a></li>
+      <li><a href="#horarios">Horarios</a></li>
       <li><a href="#faq">Preguntas</a></li>
     </ul>
     <button class="burger" id="burger" aria-label="Menú" aria-expanded="false">☰</button>
@@ -378,7 +441,7 @@ h2.title em{font-style:normal;color:var(--pink)}
       <div class="step"><div class="num">4</div><span class="ic">💳</span><h3>Comprá tu ciclo</h3><p>En la terminal elegís el programa y pagás. Siempre antes de poner la ropa en la máquina.</p></div>
       <div class="step"><div class="num">5</div><span class="ic">🔢</span><h3>Cargá la máquina indicada</h3><p>La pantalla te asigna un número. Poné la ropa, cerrá la puerta y apretá el botón hasta que se prenda la luz.</p></div>
       <div class="step"><div class="num">6</div><span class="ic">⏳</span><h3>Esperá tu turno</h3><p>Si están todas ocupadas, tu ciclo queda en espera y arranca solo cuando se libera una.</p></div>
-      <div class="step hl"><div class="num">7</div><span class="ic">📱</span><h3>Seguilo desde el celu</h3><p>Buscá tu máquina en <a href="#en-vivo">Estado en vivo</a>, tocá <b>Seguir</b> y te decimos a qué hora volver.</p></div>
+      <div class="step hl"><div class="num">7</div><span class="ic">📱</span><h3>Seguilo desde el celu</h3><p>Escaneá el <b>QR de tu máquina</b> (o buscala en <a href="#en-vivo">Estado en vivo</a>) y te decimos a qué hora volver.</p></div>
       <div class="step"><div class="num">8</div><span class="ic">✨</span><h3>Retirá y dejá listo</h3><p>Cuando la puerta se destrabe, sacá tu ropa. En la secadora, limpiá el filtro para el próximo.</p></div>
     </div>
     <p class="note">⚠ Si no seguís estas instrucciones podés dañar tu ropa o la máquina. Ante cualquier duda, consultá antes de iniciar el ciclo.</p>
@@ -415,7 +478,12 @@ h2.title em{font-style:normal;color:var(--pink)}
             <option value="10">10 min antes</option>
             <option value="15">15 min antes</option>
           </select>
+          <button class="wa" id="waBtn">💬 Por WhatsApp</button>
           <button id="shareBtn">Compartir</button>
+        </div>
+        <div class="links">
+          <button id="doneBtn">Ya retiré mi ropa</button>
+          <a id="reportLink" href="#" target="_blank" rel="noopener">Reportar un problema</a>
         </div>
       </section>
 
@@ -441,7 +509,8 @@ h2.title em{font-style:normal;color:var(--pink)}
         <div class="t">restantes</div></div></div></div>
       <div class="pbar"><i style="width:27%"></i></div>
       <div class="foot"><span>27% · Actual: 753</span>
-        <button class="follow" data-follow="m1">Seguir</button></div>
+        <button class="follow" data-follow="m1">Seguir</button>
+        </div>
     </div><div class="card s-libre" data-id="m2">
       <h3><span class="ic">🫧</span>Lavadora 2</h3>
       <span class="badge">Disponible</span>
@@ -450,6 +519,7 @@ h2.title em{font-style:normal;color:var(--pink)}
   <circle cx="20" cy="20" r="2.6" fill="#3ddc84"></circle></svg></div><div class="info"><div class="ready">✓ Lista para usar</div></div></div>
       
       <div class="foot"><span>Anterior: 742</span>
+        
         </div>
     </div><div class="card s-uso" data-id="m3">
       <h3><span class="ic">🌀</span>Secadora 3</h3>
@@ -460,7 +530,8 @@ h2.title em{font-style:normal;color:var(--pink)}
         <div class="t">restantes</div></div></div></div>
       <div class="pbar"><i style="width:85%"></i></div>
       <div class="foot"><span>85% · Actual: 755</span>
-        <button class="follow" data-follow="m3">Seguir</button></div>
+        <button class="follow" data-follow="m3">Seguir</button>
+        </div>
     </div><div class="card s-uso" data-id="m4">
       <h3><span class="ic">🫧</span>Lavadora 4</h3>
       <span class="badge">En uso</span>
@@ -470,7 +541,8 @@ h2.title em{font-style:normal;color:var(--pink)}
         <div class="t">restantes</div></div></div></div>
       <div class="pbar"><i style="width:70%"></i></div>
       <div class="foot"><span>70% · Actual: 756</span>
-        <button class="follow" data-follow="m4">Seguir</button></div>
+        <button class="follow" data-follow="m4">Seguir</button>
+        </div>
     </div><div class="card s-libre" data-id="m5">
       <h3><span class="ic">🌀</span>Secadora 5</h3>
       <span class="badge">Disponible</span>
@@ -479,6 +551,7 @@ h2.title em{font-style:normal;color:var(--pink)}
   <circle cx="20" cy="20" r="2.6" fill="#3ddc84"></circle></svg></div><div class="info"><div class="ready">✓ Lista para usar</div></div></div>
       
       <div class="foot"><span>Anterior: 745</span>
+        
         </div>
     </div><div class="card s-terminando" data-id="m6">
       <h3><span class="ic">🫧</span>Lavadora 6</h3>
@@ -489,7 +562,8 @@ h2.title em{font-style:normal;color:var(--pink)}
         <div class="t">¡Casi lista!</div></div></div></div>
       <div class="pbar"><i style="width:98%"></i></div>
       <div class="foot"><span>98% · Actual: 758</span>
-        <button class="follow" data-follow="m6">Seguir</button></div>
+        <button class="follow" data-follow="m6">Seguir</button>
+        </div>
     </div><div class="card s-libre" data-id="m7">
       <h3><span class="ic">🌀</span>Secadora 7</h3>
       <span class="badge">Disponible</span>
@@ -498,6 +572,7 @@ h2.title em{font-style:normal;color:var(--pink)}
   <circle cx="20" cy="20" r="2.6" fill="#3ddc84"></circle></svg></div><div class="info"><div class="ready">✓ Lista para usar</div></div></div>
       
       <div class="foot"><span>Anterior: 747</span>
+        
         </div>
     </div><div class="card s-error" data-id="m8">
       <h3><span class="ic">🫧</span>Lavadora 8</h3>
@@ -507,9 +582,26 @@ h2.title em{font-style:normal;color:var(--pink)}
   <circle cx="20" cy="20" r="2.6" fill="#ff5a6a"></circle></svg></div><div class="info"><div class="errmsg">⚠ Revisá la puerta de la máquina y mantené presionado el botón durante 3 segundos.</div></div></div>
       
       <div class="foot"><span>Actual: 753</span>
-        </div>
-    </div></div><!--/grid-->
+        
+        <a class="report" href="https://wa.me/5493412745374?text=Hola!%20Quiero%20reportar%20un%20problema%20con%20la%20Lavadora%208%20de%20la%20sede%20Montevideo%20596.%20La%20pantalla%20dice%3A%20%22Revis%C3%A1%20la%20puerta%20de%20la%20m%C3%A1quina%20y%20manten%C3%A9%20presionado%20el%20bot%C3%B3n%20durante%203%20segundos.%22" target="_blank" rel="noopener">Reportar</a></div>
+    </div></div>
       <div class="apifoot" id="foot">ejemplo · 8 máquinas · Montevideo 596</div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="horarios" style="padding-top:24px">
+  <div class="wrap">
+    <span class="eyebrow">Planificá tu visita</span>
+    <h2 class="title">¿Cuándo <em>conviene ir?</em></h2>
+    <p class="lead">Qué tan ocupado suele estar el local en cada hora. Elegí el día y evitá la espera.</p>
+    <div class="chartbox">
+      <div class="days" id="days" role="group" aria-label="Día"><button data-d="1" aria-pressed="false">Lun</button><button data-d="2" aria-pressed="false">Mar</button><button data-d="3" aria-pressed="false">Mié</button><button data-d="4" aria-pressed="false">Jue</button><button data-d="5" aria-pressed="true">Vie</button><button data-d="6" aria-pressed="false">Sáb</button><button data-d="0" aria-pressed="false">Dom</button></div>
+      <div class="best" id="best"><div><b>10 a 12 h</b>menos gente (de día)</div><div><b>20 h</b>hora pico</div></div>
+      <div id="chartWrap"><svg class="chart" viewBox="0 0 566 230" role="img" aria-label="Ocupación típica por hora, Vie"><line class="g" x1="40" x2="562" y1="204" y2="204"></line><text x="34" y="208" text-anchor="end">0%</text><line class="g" x1="40" x2="562" y1="113" y2="113"></line><text x="34" y="117" text-anchor="end">50%</text><line class="g" x1="40" x2="562" y1="22" y2="22"></line><text x="34" y="26" text-anchor="end">100%</text><rect class="hit" x="40" y="22" width="21.75" height="182" data-h="0"></rect><path class="b" data-h="0" d="M41,204 V198.9 Q41,194.9 45,194.9 H56.75 Q60.75,194.9 60.75,198.9 V204 Z"></path><text x="50.875" y="222" text-anchor="middle">0h</text><rect class="hit" x="61.75" y="22" width="21.75" height="182" data-h="1"></rect><path class="b" data-h="1" d="M62.75,204 V198.9 Q62.75,194.9 66.75,194.9 H78.5 Q82.5,194.9 82.5,198.9 V204 Z"></path><rect class="hit" x="83.5" y="22" width="21.75" height="182" data-h="2"></rect><path class="b" data-h="2" d="M84.5,204 V198.9 Q84.5,194.9 88.5,194.9 H100.25 Q104.25,194.9 104.25,198.9 V204 Z"></path><rect class="hit" x="105.25" y="22" width="21.75" height="182" data-h="3"></rect><path class="b" data-h="3" d="M106.25,204 V198.9 Q106.25,194.9 110.25,194.9 H122 Q126,194.9 126,198.9 V204 Z"></path><text x="116.125" y="222" text-anchor="middle">3h</text><rect class="hit" x="127" y="22" width="21.75" height="182" data-h="4"></rect><path class="b" data-h="4" d="M128,204 V198.9 Q128,194.9 132,194.9 H143.75 Q147.75,194.9 147.75,198.9 V204 Z"></path><rect class="hit" x="148.75" y="22" width="21.75" height="182" data-h="5"></rect><path class="b" data-h="5" d="M149.75,204 V197.07999999999998 Q149.75,193.07999999999998 153.75,193.07999999999998 H165.5 Q169.5,193.07999999999998 169.5,197.07999999999998 V204 Z"></path><rect class="hit" x="170.5" y="22" width="21.75" height="182" data-h="6"></rect><path class="b" data-h="6" d="M171.5,204 V189.8 Q171.5,185.8 175.5,185.8 H187.25 Q191.25,185.8 191.25,189.8 V204 Z"></path><text x="181.375" y="222" text-anchor="middle">6h</text><rect class="hit" x="192.25" y="22" width="21.75" height="182" data-h="7"></rect><path class="b" data-h="7" d="M193.25,204 V169.78 Q193.25,165.78 197.25,165.78 H209 Q213,165.78 213,169.78 V204 Z"></path><rect class="hit" x="214" y="22" width="21.75" height="182" data-h="8"></rect><path class="b" data-h="8" d="M215,204 V158.85999999999999 Q215,154.85999999999999 219,154.85999999999999 H230.75 Q234.75,154.85999999999999 234.75,158.85999999999999 V204 Z"></path><rect class="hit" x="235.75" y="22" width="21.75" height="182" data-h="9"></rect><path class="b" data-h="9" d="M236.75,204 V169.78 Q236.75,165.78 240.75,165.78 H252.5 Q256.5,165.78 256.5,169.78 V204 Z"></path><text x="246.625" y="222" text-anchor="middle">9h</text><rect class="hit" x="257.5" y="22" width="21.75" height="182" data-h="10"></rect><path class="b" data-h="10" d="M258.5,204 V182.52 Q258.5,178.52 262.5,178.52 H274.25 Q278.25,178.52 278.25,182.52 V204 Z"></path><rect class="hit" x="279.25" y="22" width="21.75" height="182" data-h="11"></rect><path class="b" data-h="11" d="M280.25,204 V178.88 Q280.25,174.88 284.25,174.88 H296 Q300,174.88 300,178.88 V204 Z"></path><rect class="hit" x="301" y="22" width="21.75" height="182" data-h="12"></rect><path class="b" data-h="12" d="M302,204 V162.5 Q302,158.5 306,158.5 H317.75 Q321.75,158.5 321.75,162.5 V204 Z"></path><text x="311.875" y="222" text-anchor="middle">12h</text><rect class="hit" x="322.75" y="22" width="21.75" height="182" data-h="13"></rect><path class="b" data-h="13" d="M323.75,204 V153.39999999999998 Q323.75,149.39999999999998 327.75,149.39999999999998 H339.5 Q343.5,149.39999999999998 343.5,153.39999999999998 V204 Z"></path><rect class="hit" x="344.5" y="22" width="21.75" height="182" data-h="14"></rect><path class="b" data-h="14" d="M345.5,204 V162.5 Q345.5,158.5 349.5,158.5 H361.25 Q365.25,158.5 365.25,162.5 V204 Z"></path><rect class="hit" x="366.25" y="22" width="21.75" height="182" data-h="15"></rect><path class="b" data-h="15" d="M367.25,204 V177.06 Q367.25,173.06 371.25,173.06 H383 Q387,173.06 387,177.06 V204 Z"></path><text x="377.125" y="222" text-anchor="middle">15h</text><rect class="hit" x="388" y="22" width="21.75" height="182" data-h="16"></rect><path class="b" data-h="16" d="M389,204 V182.52 Q389,178.52 393,178.52 H404.75 Q408.75,178.52 408.75,182.52 V204 Z"></path><rect class="hit" x="409.75" y="22" width="21.75" height="182" data-h="17"></rect><path class="b" data-h="17" d="M410.75,204 V164.32 Q410.75,160.32 414.75,160.32 H426.5 Q430.5,160.32 430.5,164.32 V204 Z"></path><rect class="hit" x="431.5" y="22" width="21.75" height="182" data-h="18"></rect><path class="b" data-h="18" d="M432.5,204 V127.92000000000002 Q432.5,123.92000000000002 436.5,123.92000000000002 H448.25 Q452.25,123.92000000000002 452.25,127.92000000000002 V204 Z"></path><text x="442.375" y="222" text-anchor="middle">18h</text><rect class="hit" x="453.25" y="22" width="21.75" height="182" data-h="19"></rect><path class="b" data-h="19" d="M454.25,204 V86.06 Q454.25,82.06 458.25,82.06 H470 Q474,82.06 474,86.06 V204 Z"></path><rect class="hit" x="475" y="22" width="21.75" height="182" data-h="20"></rect><path class="b" data-h="20" d="M476,204 V67.86 Q476,63.86 480,63.86 H491.75 Q495.75,63.86 495.75,67.86 V204 Z"></path><rect class="hit" x="496.75" y="22" width="21.75" height="182" data-h="21"></rect><path class="b" data-h="21" d="M497.75,204 V86.06 Q497.75,82.06 501.75,82.06 H513.5 Q517.5,82.06 517.5,86.06 V204 Z"></path><text x="507.625" y="222" text-anchor="middle">21h</text><rect class="hit" x="518.5" y="22" width="21.75" height="182" data-h="22"></rect><path class="b" data-h="22" d="M519.5,204 V127.92000000000002 Q519.5,123.92000000000002 523.5,123.92000000000002 H535.25 Q539.25,123.92000000000002 539.25,127.92000000000002 V204 Z"></path><rect class="hit" x="540.25" y="22" width="21.75" height="182" data-h="23"></rect><path class="b" data-h="23" d="M541.25,204 V166.14000000000001 Q541.25,162.14000000000001 545.25,162.14000000000001 H557 Q561,162.14000000000001 561,166.14000000000001 V204 Z"></path></svg></div>
+      <div class="tip" id="tip"></div>
+      <details><summary>Ver como tabla</summary><table id="chartTable"><tbody><tr><th>Hora</th><th>Ocupación</th><th></th></tr><tr><td>0:00</td><td>5%</td><td>Tranquilo</td></tr><tr><td>1:00</td><td>5%</td><td>Tranquilo</td></tr><tr><td>2:00</td><td>5%</td><td>Tranquilo</td></tr><tr><td>3:00</td><td>5%</td><td>Tranquilo</td></tr><tr><td>4:00</td><td>5%</td><td>Tranquilo</td></tr><tr><td>5:00</td><td>6%</td><td>Tranquilo</td></tr><tr><td>6:00</td><td>10%</td><td>Tranquilo</td></tr><tr><td>7:00</td><td>21%</td><td>Tranquilo</td></tr><tr><td>8:00</td><td>27%</td><td>Tranquilo</td></tr><tr><td>9:00</td><td>21%</td><td>Tranquilo</td></tr><tr><td>10:00</td><td>14%</td><td>Tranquilo</td></tr><tr><td>11:00</td><td>16%</td><td>Tranquilo</td></tr><tr><td>12:00</td><td>25%</td><td>Tranquilo</td></tr><tr><td>13:00</td><td>30%</td><td>Tranquilo</td></tr><tr><td>14:00</td><td>25%</td><td>Tranquilo</td></tr><tr><td>15:00</td><td>17%</td><td>Tranquilo</td></tr><tr><td>16:00</td><td>14%</td><td>Tranquilo</td></tr><tr><td>17:00</td><td>24%</td><td>Tranquilo</td></tr><tr><td>18:00</td><td>44%</td><td>Moderado</td></tr><tr><td>19:00</td><td>67%</td><td>Muy concurrido</td></tr><tr><td>20:00</td><td>77%</td><td>Muy concurrido</td></tr><tr><td>21:00</td><td>67%</td><td>Muy concurrido</td></tr><tr><td>22:00</td><td>44%</td><td>Moderado</td></tr><tr><td>23:00</td><td>23%</td><td>Tranquilo</td></tr></tbody></table></details>
+      <p class="apifoot" id="chartNote">Datos de ejemplo · con el historial real del local se calcula solo</p>
     </div>
   </div>
 </section>
@@ -524,9 +616,9 @@ h2.title em{font-style:normal;color:var(--pink)}
         <a class="btn" href="#en-vivo">Seguir mi máquina →</a>
       </div>
       <ol>
-        <li><span class="k">1</span><div><b>Mirá el tiempo</b><span>Buscá tu máquina y tocá <b>Seguir</b>: te mostramos los minutos y la hora exacta de fin.</span></div></li>
-        <li><span class="k">2</span><div><b>Hacé lo tuyo</b><span>Activá <b>Avisarme</b> y el celu te suena 5, 10 o 15 minutos antes.</span></div></li>
-        <li><span class="k">3</span><div><b>Volvé antes del final</b><span>Así retirás tu ropa a tiempo y la máquina queda libre para el próximo.</span></div></li>
+        <li><span class="k">1</span><div><b>Escaneá el QR</b><span>Cada máquina tiene su QR. Lo escaneás y ya la estás siguiendo: minutos restantes y hora exacta de fin.</span></div></li>
+        <li><span class="k">2</span><div><b>Hacé lo tuyo</b><span>Activá el aviso y te llega un WhatsApp (o te suena el celu) antes de que termine.</span></div></li>
+        <li><span class="k">3</span><div><b>Volvé antes del final</b><span>Si te colgaste, te recordamos que tu ropa te espera: así la máquina queda libre para el próximo.</span></div></li>
       </ol>
     </div>
     <p class="note" style="margin-top:14px">🔒 Prendas y pertenencias bajo responsabilidad del cliente.</p>
@@ -583,7 +675,8 @@ h2.title em{font-style:normal;color:var(--pink)}
       <details><summary>¿Cuánto tarda un ciclo?</summary><p>Alrededor de 50 minutos el lavado y algo más el secado, según el programa. El tiempo exacto de tu máquina lo ves en <a href="#en-vivo">Estado en vivo</a>.</p></details>
       <details><summary>¿Qué pasa si están todas ocupadas?</summary><p>Comprás igual tu ciclo: queda en espera y arranca solo cuando se libera una máquina. En la web te mostramos cuál se libera primero.</p></details>
       <details><summary>¿Me puedo ir mientras lava?</summary><p>Sí. Seguí tu máquina desde el celu y activá el aviso. Lo único: volvé antes de que termine para retirar tu ropa a tiempo.</p></details>
-      <details><summary>¿Cómo funciona el aviso?</summary><p>Al tocar <b>Avisarme</b> el celu te notifica, vibra y suena cuando falten los minutos que elijas. Tené la página abierta (puede estar en segundo plano).</p></details>
+      <details><summary>¿Para qué es el QR de cada máquina?</summary><p>Lo escaneás con la cámara del celu y la web se abre ya siguiendo esa máquina: no tenés que buscarla ni registrarte.</p></details>
+      <details><summary>¿Cómo funciona el aviso?</summary><p>Al tocar <b>Avisarme</b> el celu te notifica, vibra y suena cuando falten los minutos que elijas. Tené la página abierta (puede estar en segundo plano). También podés pedir el aviso por WhatsApp.</p></details>
       <details><summary>La máquina muestra "Error", ¿qué hago?</summary><p>Revisá que la puerta esté bien cerrada y mantené presionado el botón durante 3 segundos. Si sigue, escribinos por WhatsApp.</p></details>
       <details><summary>¿Tengo que llevar jabón?</summary><p>Consultá por WhatsApp qué incluye cada programa en tu sede.</p></details>
     </div>
@@ -610,6 +703,30 @@ h2.title em{font-style:normal;color:var(--pink)}
     <small>Lavandería autoservicio 24/7 · Rosario, Santa Fe</small>
   </div>
 </footer>
+
+<div class="modal" id="waModal" role="dialog" aria-modal="true" aria-labelledby="waTitle">
+  <div class="sheet">
+    <span class="demo-tag">Demo</span>
+    <div id="waForm">
+      <h3 id="waTitle">Avisarme por WhatsApp</h3>
+      <p class="m" id="waSub">Te escribimos cuando esté por terminar tu máquina. Sin instalar nada.</p>
+      <label for="waPhone">Tu número de celular</label>
+      <div class="tel"><span>+54 9</span><input id="waPhone" type="tel" inputmode="tel" placeholder="341 555 1234" autocomplete="tel-national"></div>
+      <label class="chk"><input type="checkbox" id="waLead" checked> Avisarme 5 minutos antes de que termine</label>
+      <label class="chk"><input type="checkbox" id="waForgot" checked> Recordarme si me olvido la ropa en la máquina</label>
+      <div class="row"><button class="cancel" id="waCancel">Cancelar</button><button class="go" id="waGo">Activar aviso</button></div>
+    </div>
+    <div id="waDone" hidden>
+      <h3>¡Listo! Así te va a llegar 👇</h3>
+      <div class="chat">
+        <div class="top"><span class="av">L</span><div>Lavando<small>cuenta de empresa</small></div></div>
+        <div class="body" id="waChat"></div>
+      </div>
+      <p class="m" style="margin-top:12px">En la versión real estos mensajes llegan desde el WhatsApp oficial de Lavando. En esta demo no se envía nada ni se guarda tu número fuera de tu celular.</p>
+      <div class="row"><button class="go" id="waOk">Entendido</button></div>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -785,7 +902,7 @@ async function load() {
   if (!data) { data = normalize(demoData(sede.id)); S.modo = 'demo'; }
   data.sort((a, b) => (parseInt(a.nombre.replace(/\D/g, '')) || 0) - (parseInt(b.nombre.replace(/\D/g, '')) || 0));
   S.maquinas = data; S.fetchedAt = Date.now();
-  render();
+  render(); applyQR();
 }
 
 /* ---------- render ---------- */
@@ -849,7 +966,8 @@ function render() {
       <div class="body"><div class="drum">${drumSVG(color)}</div><div class="info">${body}</div></div>
       ${pctShow != null && canFollow ? `<div class="pbar"><i style="width:${pctShow}%"></i></div>` : ''}
       <div class="foot"><span>${pctShow != null && canFollow ? pctShow + '% · ' : ''}${ref}</span>
-        ${canFollow ? `<button class="follow" data-follow="${escapeHTML(m.id)}">${tracked ? 'Siguiendo' : 'Seguir'}</button>` : ''}</div>
+        ${canFollow ? `<button class="follow" data-follow="${escapeHTML(m.id)}">${tracked ? 'Siguiendo' : 'Seguir'}</button>` : ''}
+        ${m.e === 'error' ? `<a class="report" href="${reportURL(m)}" target="_blank" rel="noopener">Reportar</a>` : ''}</div>
     </div>`;
   }).join('');
 
@@ -857,6 +975,13 @@ function render() {
 
   $('#foot').textContent = `${S.modo === 'live' ? 'api ok' : S.modo === 'demo' ? 'ejemplo' : S.modo} · ${S.lastOk ? S.lastOk.toLocaleTimeString('es-AR') : new Date(S.fetchedAt).toLocaleTimeString('es-AR')} · ${ms.length} máquinas · ${sedeObj().nombre}`;
 }
+
+const WA_NUM = '5493412745374';
+function reportURL(m) {
+  const txt = `Hola! Quiero reportar un problema con la ${m.nombre} de la sede ${sedeObj().nombre}.` + (m.msg ? ` La pantalla dice: "${m.msg}"` : '');
+  return `https://wa.me/${WA_NUM}?text=${encodeURIComponent(txt)}`;
+}
+const minsAgo = ts => Math.max(0, Math.floor((Date.now() - ts) / 60000));
 
 function renderHero(ms) {
   const hero = $('#hero');
@@ -866,23 +991,41 @@ function renderHero(ms) {
   hero.classList.add('show');
   $('#heroName').textContent = `${t.nombre} · ${sedeObj().nombre}`;
   if (!m) { $('#heroBig').innerHTML = '–'; $('#heroWhen').textContent = 'No encontramos la máquina.'; return; }
-  if (m.e === 'libre') {
-    $('#heroBig').innerHTML = '✓';
-    $('#heroWhen').innerHTML = `<b>¡Terminó!</b>Pasá a buscar tu ropa.`;
-    $('#heroBar').style.width = '100%';
-  } else if (m.e === 'error') {
+  $('#reportLink').href = reportURL(m);
+
+  // transición de fases
+  const busy = m.e === 'uso' || m.e === 'terminando';
+  if (busy && t.fase === 'terminado') {           // arrancó otro ciclo: tu ropa ya no está ahí
+    S.tracked = null; S.notify = null; store.del('tracked'); store.del('notify');
+    hero.classList.remove('show'); toast(`La ${m.nombre} arrancó un nuevo ciclo: dejamos de seguirla.`); return;
+  }
+  if (busy && t.fase !== 'en_curso') { t.fase = 'en_curso'; t.finAt = null; store.set('tracked', t); }
+  if (m.e === 'libre' && t.fase === 'en_curso') { t.fase = 'terminado'; t.finAt = Date.now(); store.set('tracked', t); }
+
+  if (m.e === 'error') {
     $('#heroBig').innerHTML = '⚠';
     $('#heroWhen').innerHTML = `<b>Error en la máquina</b>${escapeHTML(m.msg || '')}`;
-  } else {
+    $('#heroBar').style.width = '0%';
+  } else if (busy) {
     const fin = finishAt(m);
     $('#heroBig').innerHTML = `${m.r}<small>min</small>`;
-    $('#heroWhen').innerHTML = `Volvé a las<b>${fin ? hhmm(fin) : '--:--'}</b>`;
+    $('#heroWhen').innerHTML = m.r === 0 ? `<b>¡Terminando!</b>En un momento se destraba la puerta.` : `Volvé a las<b>${fin ? hhmm(fin) : '--:--'}</b>`;
     $('#heroBar').style.width = (livePct(m) ?? 0) + '%';
+  } else if (t.fase === 'terminado') {
+    const ago = minsAgo(t.finAt);
+    $('#heroBig').innerHTML = '✓';
+    $('#heroWhen').innerHTML = ago < 1 ? `<b>¡Terminó!</b>Pasá a buscar tu ropa.`
+      : `<b>Terminó hace ${ago} min</b>Tu ropa te está esperando 🧺`;
+    $('#heroBar').style.width = '100%';
+  } else {
+    $('#heroBig').innerHTML = '▶';
+    $('#heroWhen').innerHTML = `<b>Esperando que arranque</b>Cargá la ropa, cerrá la puerta y apretá el botón.`;
+    $('#heroBar').style.width = '0%';
   }
   const n = S.notify && S.notify.sede === t.sede && S.notify.id === t.id;
   $('#notifyBtn').textContent = n ? '🔕 Cancelar aviso' : '🔔 Avisarme';
   if (n) $('#notifyLead').value = String(S.notify.lead);
-  checkNotify(m);
+  checkNotify(m, t);
 }
 
 function escapeHTML(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -901,23 +1044,29 @@ function beep() {
     });
   } catch {}
 }
-function checkNotify(m) {
-  const n = S.notify;
-  if (!n || !m || n.sede !== S.sede || n.id !== m.id || S.notified) return;
-  const done = m.e === 'libre' || (m.r != null && m.r <= n.lead);
-  if (!done) return;
-  S.notified = true;
-  const txt = m.e === 'libre' ? `${m.nombre} terminó. ¡Pasá a buscar tu ropa!` : `${m.nombre} termina en ${m.r} min. ¡Salí para Lavando!`;
+function fire(txt) {
   try { if ('Notification' in window && Notification.permission === 'granted') new Notification('Lavando', { body: txt, tag: 'lavando' }); } catch {}
   if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
   beep(); toast(txt);
-  S.notify = null; store.del('notify');
+}
+const FORGOT_MIN = 5;   // recordatorio si la ropa sigue en la máquina
+function checkNotify(m, t) {
+  const n = S.notify;
+  if (!n || !m || n.sede !== S.sede || n.id !== m.id) return;
+  if (!n.sentLead && (t.fase === 'terminado' || (m.r != null && m.r <= n.lead && t.fase === 'en_curso'))) {
+    n.sentLead = true; store.set('notify', n);
+    fire(t.fase === 'terminado' ? `${m.nombre} terminó. ¡Pasá a buscar tu ropa!` : `${m.nombre} termina en ${m.r} min. ¡Salí para Lavando!`);
+  }
+  if (!n.sentForgot && t.fase === 'terminado' && minsAgo(t.finAt) >= FORGOT_MIN) {
+    n.sentForgot = true; store.set('notify', n);
+    fire(`Tu ropa te espera hace ${minsAgo(t.finAt)} min en la ${m.nombre}. Hay gente esperando máquina 🙏`);
+  }
 }
 
 /* ---------- eventos ---------- */
 $('#sedes').addEventListener('click', e => {
   const b = e.target.closest('[data-sede]'); if (!b) return;
-  S.sede = b.dataset.sede; store.set('sede', S.sede); S.modo = 'cargando';
+  S.sede = b.dataset.sede; store.set('sede', S.sede); S.modo = 'cargando'; renderChart();
   renderSedes(); render(); load();
 });
 $('#filters').addEventListener('click', e => {
@@ -929,7 +1078,7 @@ $('#filters').addEventListener('click', e => {
 $('#grid').addEventListener('click', e => {
   const b = e.target.closest('[data-follow]'); if (!b) return;
   const m = S.maquinas.find(x => x.id === b.dataset.follow); if (!m) return;
-  S.tracked = { sede: S.sede, id: m.id, nombre: m.nombre }; store.set('tracked', S.tracked);
+  S.tracked = { sede: S.sede, id: m.id, nombre: m.nombre, fase: 'esperando' }; store.set('tracked', S.tracked);
   S.notified = false; render();
   $('#hero').scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
@@ -938,7 +1087,7 @@ $('#heroClose').addEventListener('click', () => {
 });
 $('#notifyBtn').addEventListener('click', async () => {
   const t = S.tracked; if (!t) return;
-  if (S.notify && S.notify.id === t.id) { S.notify = null; store.del('notify'); toast('Aviso cancelado'); render(); return; }
+  if (S.notify && S.notify.id === t.id && S.notify.sede === t.sede) { S.notify = null; store.del('notify'); toast('Aviso cancelado'); render(); return; }
   if ('Notification' in window && Notification.permission === 'default') { try { await Notification.requestPermission(); } catch {} }
   S.notify = { sede: t.sede, id: t.id, lead: Number($('#notifyLead').value) }; store.set('notify', S.notify);
   S.notified = false;
@@ -946,7 +1095,7 @@ $('#notifyBtn').addEventListener('click', async () => {
   render();
 });
 $('#notifyLead').addEventListener('change', () => {
-  if (S.notify) { S.notify.lead = Number($('#notifyLead').value); store.set('notify', S.notify); S.notified = false; render(); }
+  if (S.notify) { S.notify.lead = Number($('#notifyLead').value); S.notify.sentLead = false; store.set('notify', S.notify); render(); }
 });
 $('#shareBtn').addEventListener('click', async () => {
   const m = S.maquinas.find(x => S.tracked && x.id === S.tracked.id);
@@ -963,15 +1112,144 @@ burger.addEventListener('click', () => { const o = menu.classList.toggle('open')
 menu.addEventListener('click', e => { if (e.target.closest('a')) { menu.classList.remove('open'); burger.setAttribute('aria-expanded', false); } });
 document.querySelectorAll('[data-goto]').forEach(a => a.addEventListener('click', () => {
   if (S.sede === a.dataset.goto) return;
-  S.sede = a.dataset.goto; store.set('sede', S.sede); S.modo = 'cargando'; renderSedes(); render(); load();
+  S.sede = a.dataset.goto; store.set('sede', S.sede); S.modo = 'cargando'; renderSedes(); renderChart(); render(); load();
 }));
 document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+
+$('#doneBtn').addEventListener('click', () => {
+  S.tracked = null; S.notify = null; store.del('tracked'); store.del('notify');
+  toast('¡Gracias por dejar la máquina libre! 💜'); render();
+});
+
+/* ---------- WhatsApp (DEMO: no envía nada) ---------- */
+const waModal = $('#waModal');
+function openWA() {
+  const t = S.tracked; if (!t) return;
+  $('#waSub').textContent = `Te escribimos cuando esté por terminar tu ${t.nombre} (${sedeObj().nombre}). Sin instalar nada.`;
+  $('#waPhone').value = store.get('waPhone', '');
+  $('#waForm').hidden = false; $('#waDone').hidden = true;
+  waModal.classList.add('show');
+  setTimeout(() => $('#waPhone').focus(), 50);
+}
+function closeWA() { waModal.classList.remove('show'); }
+$('#waBtn').addEventListener('click', openWA);
+$('#waCancel').addEventListener('click', closeWA);
+$('#waOk').addEventListener('click', closeWA);
+waModal.addEventListener('click', e => { if (e.target === waModal) closeWA(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeWA(); });
+$('#waGo').addEventListener('click', () => {
+  const tel = $('#waPhone').value.replace(/\D/g, '');
+  if (tel.length < 10) { toast('Ingresá tu número con característica (ej: 341 555 1234)'); return; }
+  store.set('waPhone', $('#waPhone').value);
+  const t = S.tracked, m = S.maquinas.find(x => x.id === t.id);
+  const now = new Date(), fin = m ? finishAt(m) : null;
+  const at = (d, add) => hhmm(new Date(d.getTime() + add * 60000));
+  const msgs = [`<div class="when">HOY</div>`,
+    `<div class="msg">¡Hola! 👋 Activaste el aviso para tu <b>${escapeHTML(t.nombre)}</b> en ${escapeHTML(sedeObj().nombre)}.${fin ? ` Termina aprox. a las <b>${hhmm(fin)}</b>.` : ' Te avisamos cuando arranque y termine.'}<time>${hhmm(now)}</time></div>`];
+  if ($('#waLead').checked) msgs.push(`<div class="msg sched">⏰ Tu ${escapeHTML(t.nombre)} termina en 5 minutos. ¡Salí para Lavando!<time>${fin ? at(fin, -5) : 'programado'}</time></div>`);
+  msgs.push(`<div class="msg sched">✅ ¡Tu ${escapeHTML(t.nombre)} terminó! Ya podés retirar tu ropa.<time>${fin ? hhmm(fin) : 'programado'}</time></div>`);
+  if ($('#waForgot').checked) msgs.push(`<div class="msg sched">🧺 Tu ropa te espera hace ${FORGOT_MIN} min en la ${escapeHTML(t.nombre)}. Hay gente esperando máquina, ¡gracias por pasar! 💜<time>${fin ? at(fin, FORGOT_MIN) : 'programado'}</time></div>`);
+  $('#waChat').innerHTML = msgs.join('');
+  $('#waForm').hidden = true; $('#waDone').hidden = false;
+});
+
+/* ---------- ¿Cuándo conviene ir? (datos de ejemplo) ----------
+   % de ocupación típica por hora. Con datos reales: promedio histórico de
+   máquinas en uso / total, por día de semana y hora. */
+const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+let diaSel = new Date().getDay();
+function ocupacion(dia, h) {
+  const g = (mu, sd, a) => a * Math.exp(-((h - mu) ** 2) / (2 * sd * sd));
+  const finde = dia === 0 || dia === 6;
+  let v = finde ? 6 + g(11.5, 2.2, 70) + g(18, 2.2, 45)
+                : 5 + g(8, 1.2, 22) + g(13, 1.5, 25) + g(20, 1.8, 72);
+  if (dia === 1 && !finde) v += g(20, 1.8, 10);                // lunes: ropa del finde
+  if (S.sede === 'zeballos') v *= 0.9;
+  return Math.max(3, Math.min(98, Math.round(v)));
+}
+const nivel = v => v < 35 ? 'Tranquilo' : v < 65 ? 'Moderado' : 'Muy concurrido';
+function renderDays() {
+  $('#days').innerHTML = [1, 2, 3, 4, 5, 6, 0].map(d =>
+    `<button data-d="${d}" aria-pressed="${d === diaSel}">${d === new Date().getDay() ? 'Hoy' : DIAS[d]}</button>`).join('');
+}
+function renderChart() {
+  const vals = Array.from({ length: 24 }, (_, h) => ocupacion(diaSel, h));
+  const isHoy = diaSel === new Date().getDay(), hNow = new Date().getHours();
+  const W = Math.max(280, $('#chartWrap').clientWidth || 720), H = W < 500 ? 200 : 230, L = 40, R = 4, T = 22, B = 26;
+  const every = W < 500 ? 6 : 3;   // etiquetas del eje x
+  const slot = (W - L - R) / 24, bw = Math.min(24, slot - 2), ph = H - T - B;
+  const y = v => T + ph * (1 - v / 100);
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Ocupación típica por hora, ${DIAS[diaSel]}">`;
+  [0, 50, 100].forEach(v => { svg += `<line class="g" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`; });
+  vals.forEach((v, h) => {
+    const x = L + h * slot + (slot - bw) / 2, top = y(v), bh = Math.max(2, H - B - top), r = Math.min(4, bh);
+    const now = isHoy && h === hNow;
+    svg += `<rect class="hit" x="${L + h * slot}" y="${T}" width="${slot}" height="${ph}" data-h="${h}"/>`;
+    svg += `<path class="b${now ? ' now' : ''}" data-h="${h}" d="M${x},${H - B} V${top + r} Q${x},${top} ${x + r},${top} H${x + bw - r} Q${x + bw},${top} ${x + bw},${top + r} V${H - B} Z"/>`;
+    if (now) svg += `<text class="nl" x="${x + bw / 2}" y="${top - 6}" text-anchor="middle">Ahora</text>`;
+    if (h % every === 0) svg += `<text x="${L + h * slot + slot / 2}" y="${H - 8}" text-anchor="middle">${h}h</text>`;
+  });
+  $('#chartWrap').innerHTML = svg + '</svg>';
+
+  // mejor franja de 2 h entre las 8 y las 23
+  let best = 8;
+  for (let h = 8; h <= 21; h++) if (vals[h] + vals[h + 1] < vals[best] + vals[best + 1]) best = h;
+  let peak = 0; vals.forEach((v, h) => { if (v > vals[peak]) peak = h; });
+  $('#best').innerHTML = `<div><b>${best} a ${best + 2} h</b>menos gente (de día)</div>` +
+    `<div><b>${peak} h</b>hora pico</div>` +
+    (isHoy ? `<div><b>${nivel(vals[hNow])}</b>ahora (${hNow} h)</div>` : '');
+  $('#chartTable').innerHTML = '<tr><th>Hora</th><th>Ocupación</th><th></th></tr>' +
+    vals.map((v, h) => `<tr><td>${h}:00</td><td>${v}%</td><td>${nivel(v)}</td></tr>`).join('');
+}
+let rsz; addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(renderChart, 150); });
+$('#days').addEventListener('click', e => {
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  diaSel = Number(b.dataset.d); renderDays(); renderChart();
+});
+(function tooltip() {
+  const tip = $('#tip'), box = $('.chartbox');
+  const show = e => {
+    const el = e.target.closest('[data-h]'); if (!el || !el.closest('.chart')) { tip.style.display = 'none'; return; }
+    const h = Number(el.dataset.h), v = ocupacion(diaSel, h);
+    document.querySelectorAll('.chart .b').forEach(b => b.classList.toggle('hov', Number(b.dataset.h) === h));
+    const bar = document.querySelector(`.chart .b[data-h="${h}"]`).getBoundingClientRect(), bb = box.getBoundingClientRect();
+    tip.innerHTML = `<b>${h}:00 – ${h + 1}:00</b>${nivel(v)} · ${v}%`;
+    tip.style.display = 'block';
+    const x = Math.min(bb.width - 70, Math.max(70, bar.left - bb.left + bar.width / 2));
+    tip.style.left = x + 'px'; tip.style.top = (bar.top - bb.top) + 'px';
+  };
+  box.addEventListener('pointermove', show);
+  box.addEventListener('click', show);
+  box.addEventListener('pointerleave', () => { tip.style.display = 'none'; document.querySelectorAll('.chart .b.hov').forEach(b => b.classList.remove('hov')); });
+})();
+
+/* ---------- QR de máquina: ?sede=montevideo&maquina=6 ---------- */
+const QS = new URLSearchParams(location.search);
+let pendingQR = null;
+if (QS.get('maquina')) {
+  const sq = (QS.get('sede') || '').toLowerCase();
+  if (CONFIG.sedes.some(x => x.id === sq)) { S.sede = sq; store.set('sede', sq); }
+  pendingQR = parseInt(QS.get('maquina'), 10);
+}
+function applyQR() {
+  if (!pendingQR) return;
+  const m = S.maquinas.find(x => parseInt(x.nombre.replace(/\D/g, ''), 10) === pendingQR);
+  pendingQR = null;
+  history.replaceState(null, '', location.pathname + '#en-vivo');
+  if (!m) { toast('No encontramos esa máquina'); return; }
+  const busy = m.estado === 'uso' || m.estado === 'terminando';
+  S.tracked = { sede: S.sede, id: m.id, nombre: m.nombre, fase: busy ? 'en_curso' : 'esperando' };
+  store.set('tracked', S.tracked); S.notify = null; store.del('notify');
+  render();
+  setTimeout(() => $('#hero').scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+  toast(`Estás siguiendo la ${m.nombre} 👀`);
+}
 
 /* ---------- loop ---------- */
 function tickClock() { $('#clock').textContent = hhmm(new Date()); }
 renderSedes();
 document.querySelectorAll('#filters button').forEach(x => x.setAttribute('aria-pressed', x.dataset.f === S.filtro));
-tickClock(); load();
+tickClock(); renderDays(); renderChart(); load();
 setInterval(tickClock, 1000);
 setInterval(() => { if (S.maquinas.length) render(); }, 15000);   // cuenta regresiva local entre polls
 setInterval(load, CONFIG.pollMs);
