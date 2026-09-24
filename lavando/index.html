@@ -335,7 +335,7 @@ h2.title em{font-style:normal;color:var(--pink)}
       <li><a href="#como-funciona">Cómo funciona</a></li>
       <li><a href="#en-vivo">Estado en vivo</a></li>
       <li><a href="#no-permitidos">Qué no lavar</a></li>
-      <li><a href="#sedes">Sedes</a></li>
+      <li><a href="#sucursales">Sedes</a></li>
       <li><a href="#faq">Preguntas</a></li>
     </ul>
     <button class="burger" id="burger" aria-label="Menú" aria-expanded="false">☰</button>
@@ -361,7 +361,7 @@ h2.title em{font-style:normal;color:var(--pink)}
     </div>
     <div class="hero-art">
       <svg class="mascot" viewBox="0 0 200 220" role="img" aria-label="Mascota de Lavando"><use href="#mascot"/></svg>
-      <a class="livecard" href="#en-vivo" id="heroLive"><span class="n">–</span><b>máquinas libres</b>ahora en —</a>
+      <a class="livecard" href="#en-vivo" id="heroLive"><span class="n">3</span><b>máquinas libres</b>ahora en Montevideo 596 (ejemplo)</a>
     </div>
   </div>
 </header>
@@ -393,10 +393,10 @@ h2.title em{font-style:normal;color:var(--pink)}
 
     <div class="appbox">
       <div class="apphead">
-        <nav class="sedes" id="sedes" aria-label="Sede"></nav>
-        <div class="clock" id="clock">--:--</div>
+        <nav class="sedes" id="sedes" aria-label="Sede"><button class="sede" data-sede="zeballos" aria-pressed="false">📍 Zeballos 1533</button><button class="sede" data-sede="montevideo" aria-pressed="true">📍 Montevideo 596</button></nav>
+        <div class="clock" id="clock"></div>
       </div>
-      <div class="live" id="live"></div>
+      <div class="live" id="live"><span class="pill demo"><span class="led"></span>Datos de ejemplo</span><span>Así se va a ver con los datos reales del local.</span></div>
 
       <section class="hero" id="hero" aria-live="polite">
         <button class="x" id="heroClose" aria-label="Dejar de seguir">×</button>
@@ -419,7 +419,11 @@ h2.title em{font-style:normal;color:var(--pink)}
         </div>
       </section>
 
-      <div class="summary" id="summary"></div>
+      <div class="summary" id="summary">
+    <div class="stat g"><b>3</b><span>Disponibles</span></div>
+    <div class="stat r"><b>4</b><span>En uso</span></div>
+    <div class="stat"><b>1</b><span>Lavadoras libres</span></div>
+    <div class="stat"><b>2</b><span>Secadoras libres</span></div></div>
       <div class="next" id="next"></div>
 
       <div class="filters" id="filters" role="group" aria-label="Filtrar">
@@ -428,8 +432,84 @@ h2.title em{font-style:normal;color:var(--pink)}
         <button data-f="secadora" aria-pressed="false">Secadoras</button>
       </div>
 
-      <div class="grid" id="grid"></div>
-      <div class="apifoot" id="foot">—</div>
+      <div class="grid" id="grid"><div class="card s-uso" data-id="m1">
+      <h3><span class="ic">🌀</span>Secadora 1</h3>
+      <span class="badge">En uso</span>
+      <div class="body"><div class="drum"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#ff5a6a" stroke-width="2" opacity=".5"></circle>
+  <g stroke="#ff5a6a" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="20" x2="20" y2="8"></line><line x1="20" y1="20" x2="30.4" y2="26"></line><line x1="20" y1="20" x2="9.6" y2="26"></line></g>
+  <circle cx="20" cy="20" r="2.6" fill="#ff5a6a"></circle></svg></div><div class="info"><div><div class="mins">38<small>min</small></div>
+        <div class="t">restantes</div></div></div></div>
+      <div class="pbar"><i style="width:27%"></i></div>
+      <div class="foot"><span>27% · Actual: 753</span>
+        <button class="follow" data-follow="m1">Seguir</button></div>
+    </div><div class="card s-libre" data-id="m2">
+      <h3><span class="ic">🫧</span>Lavadora 2</h3>
+      <span class="badge">Disponible</span>
+      <div class="body"><div class="drum"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#3ddc84" stroke-width="2" opacity=".5"></circle>
+  <g stroke="#3ddc84" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="20" x2="20" y2="8"></line><line x1="20" y1="20" x2="30.4" y2="26"></line><line x1="20" y1="20" x2="9.6" y2="26"></line></g>
+  <circle cx="20" cy="20" r="2.6" fill="#3ddc84"></circle></svg></div><div class="info"><div class="ready">✓ Lista para usar</div></div></div>
+      
+      <div class="foot"><span>Anterior: 742</span>
+        </div>
+    </div><div class="card s-uso" data-id="m3">
+      <h3><span class="ic">🌀</span>Secadora 3</h3>
+      <span class="badge">En uso</span>
+      <div class="body"><div class="drum"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#ff5a6a" stroke-width="2" opacity=".5"></circle>
+  <g stroke="#ff5a6a" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="20" x2="20" y2="8"></line><line x1="20" y1="20" x2="30.4" y2="26"></line><line x1="20" y1="20" x2="9.6" y2="26"></line></g>
+  <circle cx="20" cy="20" r="2.6" fill="#ff5a6a"></circle></svg></div><div class="info"><div><div class="mins">8<small>min</small></div>
+        <div class="t">restantes</div></div></div></div>
+      <div class="pbar"><i style="width:85%"></i></div>
+      <div class="foot"><span>85% · Actual: 755</span>
+        <button class="follow" data-follow="m3">Seguir</button></div>
+    </div><div class="card s-uso" data-id="m4">
+      <h3><span class="ic">🫧</span>Lavadora 4</h3>
+      <span class="badge">En uso</span>
+      <div class="body"><div class="drum"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#ff5a6a" stroke-width="2" opacity=".5"></circle>
+  <g stroke="#ff5a6a" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="20" x2="20" y2="8"></line><line x1="20" y1="20" x2="30.4" y2="26"></line><line x1="20" y1="20" x2="9.6" y2="26"></line></g>
+  <circle cx="20" cy="20" r="2.6" fill="#ff5a6a"></circle></svg></div><div class="info"><div><div class="mins">15<small>min</small></div>
+        <div class="t">restantes</div></div></div></div>
+      <div class="pbar"><i style="width:70%"></i></div>
+      <div class="foot"><span>70% · Actual: 756</span>
+        <button class="follow" data-follow="m4">Seguir</button></div>
+    </div><div class="card s-libre" data-id="m5">
+      <h3><span class="ic">🌀</span>Secadora 5</h3>
+      <span class="badge">Disponible</span>
+      <div class="body"><div class="drum"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#3ddc84" stroke-width="2" opacity=".5"></circle>
+  <g stroke="#3ddc84" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="20" x2="20" y2="8"></line><line x1="20" y1="20" x2="30.4" y2="26"></line><line x1="20" y1="20" x2="9.6" y2="26"></line></g>
+  <circle cx="20" cy="20" r="2.6" fill="#3ddc84"></circle></svg></div><div class="info"><div class="ready">✓ Lista para usar</div></div></div>
+      
+      <div class="foot"><span>Anterior: 745</span>
+        </div>
+    </div><div class="card s-terminando" data-id="m6">
+      <h3><span class="ic">🫧</span>Lavadora 6</h3>
+      <span class="badge">Terminando</span>
+      <div class="body"><div class="drum"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#ff5a6a" stroke-width="2" opacity=".5"></circle>
+  <g stroke="#ff5a6a" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="20" x2="20" y2="8"></line><line x1="20" y1="20" x2="30.4" y2="26"></line><line x1="20" y1="20" x2="9.6" y2="26"></line></g>
+  <circle cx="20" cy="20" r="2.6" fill="#ff5a6a"></circle></svg></div><div class="info"><div><div class="mins">1<small>min</small></div>
+        <div class="t">¡Casi lista!</div></div></div></div>
+      <div class="pbar"><i style="width:98%"></i></div>
+      <div class="foot"><span>98% · Actual: 758</span>
+        <button class="follow" data-follow="m6">Seguir</button></div>
+    </div><div class="card s-libre" data-id="m7">
+      <h3><span class="ic">🌀</span>Secadora 7</h3>
+      <span class="badge">Disponible</span>
+      <div class="body"><div class="drum"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#3ddc84" stroke-width="2" opacity=".5"></circle>
+  <g stroke="#3ddc84" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="20" x2="20" y2="8"></line><line x1="20" y1="20" x2="30.4" y2="26"></line><line x1="20" y1="20" x2="9.6" y2="26"></line></g>
+  <circle cx="20" cy="20" r="2.6" fill="#3ddc84"></circle></svg></div><div class="info"><div class="ready">✓ Lista para usar</div></div></div>
+      
+      <div class="foot"><span>Anterior: 747</span>
+        </div>
+    </div><div class="card s-error" data-id="m8">
+      <h3><span class="ic">🫧</span>Lavadora 8</h3>
+      <span class="badge">Error</span>
+      <div class="body"><div class="drum"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#ff5a6a" stroke-width="2" opacity=".5"></circle>
+  <g stroke="#ff5a6a" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="20" x2="20" y2="8"></line><line x1="20" y1="20" x2="30.4" y2="26"></line><line x1="20" y1="20" x2="9.6" y2="26"></line></g>
+  <circle cx="20" cy="20" r="2.6" fill="#ff5a6a"></circle></svg></div><div class="info"><div class="errmsg">⚠ Revisá la puerta de la máquina y mantené presionado el botón durante 3 segundos.</div></div></div>
+      
+      <div class="foot"><span>Actual: 753</span>
+        </div>
+    </div></div><!--/grid-->
+      <div class="apifoot" id="foot">ejemplo · 8 máquinas · Montevideo 596</div>
     </div>
   </div>
 </section>
@@ -470,7 +550,7 @@ h2.title em{font-style:normal;color:var(--pink)}
   </div>
 </section>
 
-<section class="block" id="sedes">
+<section class="block" id="sucursales">
   <div class="wrap">
     <span class="eyebrow">Dónde estamos</span>
     <h2 class="title">Nuestras <em>sedes</em></h2>
@@ -653,7 +733,7 @@ function demoData(sedeId) {
 
 /* ---------- estado ---------- */
 const S = {
-  sede: store.get('sede', CONFIG.sedes[0].id),
+  sede: store.get('sede', 'montevideo'),
   filtro: store.get('filtro', 'all'),
   tracked: store.get('tracked', null),          // {sede, id, nombre}
   notify: store.get('notify', null),            // {sede, id, lead}
