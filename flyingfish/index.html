@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Flying Fish Board Co.</title>
+<meta name="description" content="Custom carbon stand up paddle boards, handcrafted in Stuart, Florida. Find your glide.">
+<meta name="theme-color" content="#03121c">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2303121c'/><path d='M50 12 C60 22 62 34 60 44 L92 58 L60 60 L57 78 L68 90 L50 84 L32 90 L43 78 L40 60 L8 58 L40 44 C38 34 40 22 50 12Z' fill='%2319e3ff'/></svg>">
+<style>
+:root{
+  --abyss:#020a11;
+  --deep:#03121c;
+  --ocean:#062a3d;
+  --tide:#0b4a63;
+  --cyan:#19e3ff;
+  --blue:#2f6bff;
+  --coral:#ff6a3d;
+  --sun:#ffc24a;
+  --foam:#eaf6ff;
+  --mist:#9db8c9;
+  --dim:#5d7a8c;
+  --line:rgba(234,246,255,.12);
+  --line2:rgba(234,246,255,.22);
+  --glass:rgba(6,42,61,.45);
+  --display:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --gutter:clamp(16px,4vw,56px);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--deep);color:var(--foam);font-family:var(--display);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img,svg,canvas{display:block}
+::selection{background:var(--cyan);color:var(--abyss)}
+
+/* ---------- NAV ---------- */
+.nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:14px var(--gutter);transition:background .4s,backdrop-filter .4s,padding .4s}
+.nav.solid{background:rgba(3,18,28,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding-block:10px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.02em;font-size:15px}
+.brand svg{width:34px;height:34px}
+.brand small{display:block;font-weight:500;font-size:10px;letter-spacing:.28em;color:var(--mist);text-transform:uppercase}
+.nav-links{display:flex;gap:28px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.nav-links a{color:var(--mist);transition:color .2s}
+.nav-links a:hover{color:var(--foam)}
+.nav-r{display:flex;align-items:center;gap:10px}
+.lang{display:flex;border:1px solid var(--line2);border-radius:99px;overflow:hidden;font-size:11px;font-weight:700;letter-spacing:.1em}
+.lang button{padding:7px 10px;color:var(--mist)}
+.lang button.on{background:var(--foam);color:var(--abyss)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:99px;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;transition:transform .25s,box-shadow .25s,background .25s}
+.btn-hot{background:var(--cyan);color:var(--abyss);box-shadow:0 0 0 0 rgba(25,227,255,.5)}
+.btn-hot:hover{transform:translateY(-2px);box-shadow:0 10px 40px -8px rgba(25,227,255,.7)}
+.btn-ghost{border:1px solid var(--line2)}
+.btn-ghost:hover{background:rgba(234,246,255,.08)}
+.btn svg{width:16px;height:16px}
+.nav .btn{padding:10px 16px;font-size:11px}
+@media (max-width:860px){.nav-links{display:none}}
+@media (max-width:420px){.nav .btn{display:none}.brand small{display:none}}
+
+.progress{position:fixed;left:0;top:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--cyan),var(--blue),var(--coral));z-index:60}
+
+/* ---------- HERO (scroll scene) ---------- */
+#hero{position:relative;height:560vh}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--abyss)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%}
+#fg{pointer-events:none}
+.bigtitle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0;will-change:opacity,transform}
+.bigtitle span{font-weight:900;font-style:italic;line-height:.8;letter-spacing:-.06em;font-size:clamp(84px,19vw,300px);background:linear-gradient(180deg,rgba(234,246,255,.95),rgba(25,227,255,.35));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+.bigtitle span+span{margin-top:.08em}
+@media (orientation:landscape){.bigtitle{flex-direction:row;gap:.22em}.bigtitle span{font-size:clamp(80px,13.5vw,250px)}.bigtitle span+span{margin-top:0}}
+.cap{position:absolute;left:var(--gutter);bottom:clamp(90px,14vh,150px);max-width:min(640px,88vw);opacity:0;will-change:opacity,transform;pointer-events:none}
+.cap .k{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--cyan);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.cap .k::before{content:"";width:34px;height:1px;background:var(--cyan)}
+.cap h2{font-weight:900;font-style:italic;letter-spacing:-.045em;line-height:.9;font-size:clamp(46px,8.4vw,120px);text-shadow:0 10px 40px rgba(0,0,0,.35)}
+.cap h2 em{font-style:italic;color:var(--cyan)}
+.cap p{margin-top:16px;color:var(--mist);font-size:clamp(15px,1.4vw,18px);line-height:1.5;max-width:44ch}
+.cap.r{left:auto;right:var(--gutter);text-align:right}
+.cap.r .k{justify-content:flex-end}
+.cap.r p{margin-left:auto}
+.cap.top{bottom:auto;top:clamp(86px,14vh,150px)}
+.final{position:absolute;left:0;right:0;bottom:clamp(40px,9vh,96px);display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;opacity:0;pointer-events:none;padding:0 var(--gutter)}
+.final.live{pointer-events:auto}
+.final .sub{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--mist)}
+.final .sub b{color:var(--cyan);font-weight:500}
+.final .ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.hint{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--mist);pointer-events:none}
+.hint i{width:1px;height:46px;background:linear-gradient(var(--cyan),transparent);position:relative;overflow:hidden}
+.hint i::after{content:"";position:absolute;left:0;top:-40%;width:1px;height:40%;background:var(--foam);animation:drip 1.8s ease-in-out infinite}
+@keyframes drip{to{top:110%}}
+.hud{position:absolute;right:var(--gutter);bottom:34px;display:flex;gap:22px;font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--dim);pointer-events:none}
+.hud div{display:flex;align-items:center;gap:10px;justify-content:flex-end;transition:color .3s}
+.hud div::after{content:"";width:18px;height:1px;background:currentColor;transition:width .3s}
+.hud div.on{color:var(--cyan)}
+.hud div.on::after{width:36px}
+@media (max-width:700px){.hud{display:none}}
+.noscript-hero{position:absolute;inset:0;display:grid;place-items:center;font-size:48px;font-weight:900}
+
+/* ---------- COMMON ---------- */
+section.block{position:relative;padding:clamp(80px,14vh,160px) var(--gutter)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:28px;height:1px;background:currentColor}
+.h-xl{font-weight:900;font-style:italic;letter-spacing:-.045em;line-height:.92;font-size:clamp(42px,7vw,104px);margin-top:18px}
+.h-xl em{color:var(--cyan);font-style:italic}
+.lead{color:var(--mist);font-size:clamp(16px,1.35vw,19px);line-height:1.6;max-width:56ch;margin-top:22px}
+.rv{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}.rv.d4{transition-delay:.32s}
+
+/* ---------- MARQUEE ---------- */
+.mq-wrap{position:relative;z-index:3;overflow:hidden;padding:40px 0;margin:-70px 0 -40px}
+.marquee{position:relative;background:var(--cyan);color:var(--abyss);transform:rotate(-2deg);margin:0 -20px;padding:16px 0;overflow:hidden;z-index:3;box-shadow:0 20px 60px -20px rgba(25,227,255,.5)}
+.marquee .track{display:flex;width:max-content;animation:mq 26s linear infinite}
+.marquee span{font-weight:900;font-style:italic;font-size:clamp(22px,3vw,40px);letter-spacing:-.03em;padding-right:40px;white-space:nowrap;display:flex;align-items:center;gap:40px}
+.marquee span svg{width:36px;height:36px}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ---------- LINEUP ---------- */
+#lineup{background:radial-gradient(1200px 600px at 80% 0%,rgba(47,107,255,.14),transparent 60%),var(--deep)}
+.lineup-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap}
+.cards{margin-top:clamp(40px,7vh,80px);display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:620px){.cards{grid-template-columns:1fr}}
+.card{position:relative;border:1px solid var(--line);border-radius:22px;padding:22px;background:linear-gradient(180deg,rgba(11,74,99,.28),rgba(3,18,28,.2));overflow:hidden;isolation:isolate;transition:border-color .3s,transform .5s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d;min-height:430px;display:flex;flex-direction:column}
+.card::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(420px circle at var(--mx,50%) var(--my,30%),rgba(25,227,255,.16),transparent 45%);opacity:0;transition:opacity .3s}
+.card:hover{border-color:var(--line2)}
+.card:hover::before{opacity:1}
+.card .tag{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);display:flex;justify-content:space-between}
+.card .tag b{color:var(--cyan);font-weight:500}
+.card .board-wrap{flex:1;display:grid;place-items:center;padding:14px 0;min-height:210px}
+.card .board-wrap svg{width:100%;height:auto;max-height:230px;transform:rotate(-35deg) scale(1.02);transition:transform .8s cubic-bezier(.2,.7,.2,1);filter:drop-shadow(0 24px 22px rgba(0,0,0,.45))}
+.card:hover .board-wrap svg{transform:rotate(-30deg) scale(1.08) translateY(-6px)}
+.card h3{font-weight:900;font-style:italic;font-size:32px;letter-spacing:-.04em;line-height:1}
+.card p{color:var(--mist);font-size:14px;line-height:1.55;margin-top:10px}
+.card .specs{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+.chip{font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:99px;border:1px solid var(--line2);color:var(--foam);letter-spacing:.04em}
+
+/* ---------- CONFIGURATOR ---------- */
+#build{background:linear-gradient(180deg,var(--deep),var(--abyss))}
+.build-grid{margin-top:clamp(36px,6vh,70px);display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(20px,3vw,48px);align-items:stretch}
+@media (max-width:960px){.build-grid{grid-template-columns:1fr}.bench{min-height:280px}}
+.bench{position:relative;border-radius:28px;border:1px solid var(--line);overflow:hidden;min-height:460px;display:grid;place-items:center;background:
+  radial-gradient(60% 50% at 50% 55%,rgba(25,227,255,.14),transparent 70%),
+  repeating-linear-gradient(90deg,rgba(234,246,255,.04) 0 1px,transparent 1px 64px),
+  repeating-linear-gradient(0deg,rgba(234,246,255,.04) 0 1px,transparent 1px 64px),
+  #041620}
+.bench svg{width:92%;height:auto;max-height:78%;animation:float 6s ease-in-out infinite;filter:drop-shadow(0 40px 34px rgba(0,0,0,.55))}
+@keyframes float{0%,100%{transform:translateY(-6px) rotate(-1.2deg)}50%{transform:translateY(8px) rotate(.8deg)}}
+.bench .meta{position:absolute;left:22px;top:20px;right:22px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist)}
+.bench .meta b{color:var(--foam);font-weight:500}
+.bench .ruler{position:absolute;left:4%;right:4%;bottom:24px;height:18px;border-top:1px solid var(--line2);display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--dim)}
+.bench .ruler span{position:relative;padding-top:6px}
+.bench .ruler span::before{content:"";position:absolute;top:-1px;left:0;width:1px;height:6px;background:var(--line2)}
+.panel{border:1px solid var(--line);border-radius:28px;padding:26px;background:rgba(6,42,61,.25);display:flex;flex-direction:column;gap:26px}
+.panel h4{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mist);margin-bottom:12px;display:flex;justify-content:space-between}
+.panel h4 b{color:var(--foam);font-weight:500}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{padding:10px 14px;border-radius:12px;border:1px solid var(--line2);font-size:13px;font-weight:700;transition:all .2s;text-align:left}
+.opt small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;color:var(--mist);margin-top:2px}
+.opt:hover{border-color:var(--foam)}
+.opt.on{background:var(--foam);color:var(--abyss);border-color:var(--foam)}
+.opt.on small{color:#3b5566}
+.sw{width:44px;height:44px;border-radius:50%;border:2px solid transparent;outline:1px solid var(--line2);outline-offset:3px;transition:transform .2s,outline-color .2s;position:relative}
+.sw:hover{transform:scale(1.08)}
+.sw.on{outline:2px solid var(--foam)}
+.field{display:flex;align-items:center;border:1px solid var(--line2);border-radius:12px;padding:0 14px;transition:border-color .2s}
+.field:focus-within{border-color:var(--cyan)}
+.field input{flex:1;background:none;border:0;outline:0;color:var(--foam);font:700 16px var(--display);padding:13px 0;letter-spacing:.06em;text-transform:uppercase;min-width:0}
+.field span{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.panel .btn{justify-content:center;margin-top:auto}
+.note{font-size:12px;color:var(--dim);line-height:1.5}
+
+/* ---------- TECH (exploded) ---------- */
+#tech{height:260vh;padding:0}
+#tech .pin{position:sticky;top:0;height:100vh;height:100svh;display:grid;grid-template-columns:.9fr 1.4fr;align-items:center;gap:clamp(20px,4vw,60px);padding:0 var(--gutter);overflow:hidden;background:radial-gradient(900px 500px at 70% 50%,rgba(47,107,255,.12),transparent 70%),var(--abyss)}
+@media (max-width:900px){#tech .pin{grid-template-columns:1fr;align-content:center;gap:10px}}
+.explode{position:relative;width:100%}
+.explode svg{width:100%;height:auto;overflow:visible}
+.explode .num{font-family:var(--mono);font-size:22px;fill:var(--cyan)}
+.legend{list-style:none;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:8px}
+.legend li{border-top:1px solid var(--line2);padding-top:10px;opacity:.25;transition:opacity .4s,border-color .4s}
+.legend li.on{opacity:1;border-color:var(--cyan)}
+.legend b{display:block;font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:500;margin-bottom:4px}
+.legend span{display:block;font-size:13px;font-weight:700;line-height:1.25}
+.legend small{display:block;font-size:12px;color:var(--mist);margin-top:3px;line-height:1.35}
+@media (max-width:900px){#tech .lead,#tech .steps{display:none}.legend{grid-template-columns:repeat(3,1fr)}.legend small{display:none}#tech .h-xl{font-size:clamp(40px,11vw,64px)}}
+.steps{display:flex;gap:26px;margin-top:30px;flex-wrap:wrap}
+.steps div{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist)}
+.steps b{display:block;font-family:var(--display);font-size:clamp(28px,3vw,40px);font-style:italic;font-weight:900;letter-spacing:-.03em;color:var(--foam);margin-bottom:4px}
+
+/* ---------- TEAM ---------- */
+#team{overflow:hidden;background:var(--deep)}
+.team-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(28px,5vw,80px);align-items:center}
+@media (max-width:960px){.team-grid{grid-template-columns:1fr}}
+.portrait{position:relative;aspect-ratio:4/5;border-radius:30px;overflow:hidden;border:1px solid var(--line);background:#041a26}
+.portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.portrait canvas{position:absolute;inset:0;width:100%;height:100%}
+.portrait .vert{position:absolute;right:-.06em;top:0;bottom:0;writing-mode:vertical-rl;font-weight:900;font-style:italic;font-size:clamp(90px,13vw,170px);letter-spacing:-.05em;line-height:.8;color:transparent;-webkit-text-stroke:1.5px rgba(234,246,255,.28);display:flex;align-items:center;pointer-events:none}
+.portrait .badge{position:absolute;left:18px;bottom:18px;right:18px;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist)}
+.portrait .badge b{display:block;color:var(--foam);font-family:var(--display);font-size:20px;letter-spacing:-.01em;text-transform:none;font-weight:800;font-style:italic;margin-top:4px}
+.flag{display:inline-flex;width:28px;height:18px;border-radius:3px;overflow:hidden;flex-direction:column;box-shadow:0 0 0 1px rgba(255,255,255,.2)}
+.flag i{flex:1;background:#74acdf}.flag i:nth-child(2){background:#fff;position:relative}
+.flag i:nth-child(2)::after{content:"";position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px;border-radius:50%;background:#f6b40e}
+.medals{margin-top:34px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (max-width:520px){.medals{grid-template-columns:1fr}}
+.medal{border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;gap:14px;align-items:flex-start;background:rgba(6,42,61,.25);transition:border-color .3s,transform .3s}
+.medal:hover{border-color:var(--line2);transform:translateY(-3px)}
+.medal .disc{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:13px;color:#3a2600;background:radial-gradient(circle at 35% 30%,#fff4c2,#ffc24a 40%,#b8860b)}
+.medal .disc.bz{background:radial-gradient(circle at 35% 30%,#ffe0c4,#d38a4e 42%,#7a4318);color:#2a1406}
+.medal .disc.go{background:radial-gradient(circle at 35% 30%,#d9fbff,#19e3ff 45%,#0a6f86);color:#012}
+.medal h5{font-size:16px;font-weight:800;letter-spacing:-.01em;line-height:1.25}
+.medal p{font-family:var(--mono);font-size:11px;color:var(--mist);letter-spacing:.06em;margin-top:5px;line-height:1.5}
+.quote{margin-top:34px;padding-left:20px;border-left:2px solid var(--cyan);font-size:clamp(18px,1.7vw,22px);font-style:italic;line-height:1.45;color:var(--foam)}
+.quote cite{display:block;font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mist);margin-top:10px}
+.team-cta{margin-top:30px;display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---------- CONTACT / FOOTER ---------- */
+#contact{text-align:center;overflow:hidden;background:radial-gradient(70% 60% at 50% 100%,rgba(25,227,255,.18),transparent 70%),var(--abyss)}
+#contact .h-xl{font-size:clamp(56px,12vw,190px);line-height:.85}
+#contact .lead{margin-inline:auto}
+#contact .ctas{margin-top:36px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.wave-sep{display:block;width:100%;height:80px}
+footer{padding:36px var(--gutter) calc(36px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;font-size:12px;color:var(--dim);background:var(--abyss)}
+footer .brand{color:var(--foam)}
+footer nav{display:flex;gap:20px;flex-wrap:wrap}
+footer a:hover{color:var(--foam)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .marquee .track,.bench svg,.hint i::after{animation:none}
+  .rv{opacity:1;transform:none;transition:none}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<header class="nav" id="nav">
+  <a href="#hero" class="brand" aria-label="Flying Fish Board Co.">
+    <svg viewBox="-1.1 -1.1 2.2 2.2" class="fish-mark" aria-hidden="true"></svg>
+    <span>FLYING FISH<small>Board Co.</small></span>
+  </a>
+  <nav class="nav-links">
+    <a href="#lineup" data-i18n="nav.lineup">Line-up</a>
+    <a href="#build" data-i18n="nav.build">Build yours</a>
+    <a href="#tech" data-i18n="nav.tech">Tech</a>
+    <a href="#team" data-i18n="nav.team">Team</a>
+  </nav>
+  <div class="nav-r">
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="en" class="on">EN</button><button data-lang="es">ES</button>
+    </div>
+    <a href="#build" class="btn btn-hot" data-i18n="nav.cta">Build yours</a>
+  </div>
+</header>
+
+<!-- ================= HERO: fish -> board ================= -->
+<section id="hero" aria-label="Flying Fish">
+  <div class="stage" id="stage">
+    <canvas id="bg" aria-hidden="true"></canvas>
+    <div class="bigtitle" id="bigtitle" aria-hidden="true"><span>FLYING</span><span>FISH</span></div>
+    <canvas id="fg" aria-hidden="true"></canvas>
+
+    <div class="cap r top" data-win="0,.13">
+      <div class="k">01 · <span data-i18n="c1.k">The deep</span></div>
+      <h2 data-i18n="c1.h">Born in<br>the <em>water.</em></h2>
+      <p data-i18n="c1.p">Every Flying Fish starts the same way: below the surface, shaped for one paddler.</p>
+    </div>
+    <div class="cap" data-win=".25,.45">
+      <div class="k">02 · <span data-i18n="c2.k">Breach</span></div>
+      <h2 data-i18n="c2.h">Breaks the<br>surface.<br><em>Takes flight.</em></h2>
+    </div>
+    <div class="cap" data-win=".56,.8">
+      <div class="k">03 · <span data-i18n="c3.k">Transform</span></div>
+      <h2 data-i18n="c3.h">Becomes<br>a <em>board.</em></h2>
+      <p data-i18n="c3.p">Closed-cell foam, wrapped in carbon fiber, tinted in resin to your spec.</p>
+    </div>
+
+    <div class="final" id="final">
+      <div class="sub" data-i18n="final.sub">Handcrafted in Stuart, Florida · <b>#FINDYOURGLIDE</b></div>
+      <div class="ctas">
+        <a href="#build" class="btn btn-hot"><span data-i18n="final.cta1">Build your board</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <a href="#team" class="btn btn-ghost" data-i18n="final.cta2">Meet the team</a>
+      </div>
+    </div>
+
+    <div class="hint" id="hint"><span data-i18n="hint">Scroll</span><i></i></div>
+    <div class="hud" id="hud" aria-hidden="true">
+      <div data-i18n="hud.1">DEEP</div><div data-i18n="hud.2">BREACH</div><div data-i18n="hud.3">FLIGHT</div><div data-i18n="hud.4">BOARD</div>
+    </div>
+    <noscript><div class="noscript-hero">FLYING FISH</div></noscript>
+  </div>
+</section>
+
+<div class="mq-wrap"><div class="marquee" aria-hidden="true">
+  <div class="track" id="mq"></div>
+</div></div>
+
+<!-- ================= LINE-UP ================= -->
+<section class="block" id="lineup">
+  <div class="lineup-head">
+    <div>
+      <div class="eyebrow rv" data-i18n="lu.k">The line-up</div>
+      <h2 class="h-xl rv d1" data-i18n="lu.h">One school.<br><em>Every water.</em></h2>
+    </div>
+    <p class="lead rv d2" data-i18n="lu.p">From flatwater sprints to open-ocean downwinders. Every shape is built to order — your weight, your water, your glide.</p>
+  </div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<!-- ================= CONFIGURATOR ================= -->
+<section class="block" id="build">
+  <div class="eyebrow rv" data-i18n="b.k">Custom shop</div>
+  <h2 class="h-xl rv d1" data-i18n="b.h">Tint it.<br><em>Name it.</em> Own it.</h2>
+  <p class="lead rv d2" data-i18n="b.p">Every board is custom made for its paddler and finished with a custom color resin tint. Play with the shape and color — then send it to the shop.</p>
+
+  <div class="build-grid">
+    <div class="bench rv">
+      <div class="meta"><span><span data-i18n="b.model">Model</span> · <b id="bm-name">Freedom Pro</b></span><span id="bm-dim">14' × 24"</span></div>
+      <svg id="bench-svg" viewBox="-1.08 -0.34 2.16 0.68" aria-label="Board preview"></svg>
+    </div>
+    <div class="panel rv d1">
+      <div>
+        <h4><span data-i18n="b.shape">Shape</span></h4>
+        <div class="opts" id="opt-model"></div>
+      </div>
+      <div>
+        <h4><span data-i18n="b.tint">Resin tint</span><b id="tint-name">Gulf Stream</b></h4>
+        <div class="opts" id="opt-tint"></div>
+      </div>
+      <div>
+        <h4><span data-i18n="b.pad">Deck pad</span><b id="pad-name">Midnight</b></h4>
+        <div class="opts" id="opt-pad"></div>
+      </div>
+      <div>
+        <h4><span data-i18n="b.name">Name on the board</span></h4>
+        <label class="field"><input id="nm" maxlength="14" value="SANTI" aria-label="Name on the board"><span id="nm-c">5/14</span></label>
+      </div>
+      <a class="btn btn-hot" id="order" href="https://www.flyingfishboardco.com/" target="_blank" rel="noopener"><span data-i18n="b.cta">Send to the shop</span>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      <p class="note" data-i18n="b.note">Illustrative silhouettes. Final shape, volume and color are confirmed with the shaper.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TECH ================= -->
+<section id="tech">
+  <div class="pin">
+    <div>
+      <div class="eyebrow" data-i18n="t.k">Anatomy of a glide</div>
+      <h2 class="h-xl" data-i18n="t.h">Light.<br>Stiff.<br><em>Alive.</em></h2>
+      <p class="lead" data-i18n="t.p">Shaped from closed-cell foam, wrapped in carbon fiber and finished with custom tinted resin. Nothing extra — every gram is there to make you faster.</p>
+      <div class="steps">
+        <div><b>01</b><span data-i18n="t.s1">Shaped</span></div>
+        <div><b>02</b><span data-i18n="t.s2">Wrapped</span></div>
+        <div><b>03</b><span data-i18n="t.s3">Tinted</span></div>
+      </div>
+    </div>
+    <div class="explode" id="explode"></div>
+  </div>
+</section>
+
+<!-- ================= TEAM ================= -->
+<section class="block" id="team">
+  <div class="team-grid">
+    <div class="portrait rv" id="portrait">
+      <!-- Para usar una foto real: descomentar y poner la ruta
+      <img src="santino.jpg" alt="Santino Basaldella paddling"> -->
+      <canvas id="pcv" aria-hidden="true"></canvas>
+      <div class="vert" aria-hidden="true">SANTINO</div>
+      <div class="badge">
+        <div><span data-i18n="tm.rider">Team rider</span><b>Santino Basaldella</b></div>
+        <div style="display:flex;align-items:center;gap:8px">ROSARIO <span class="flag" aria-label="Argentina"><i></i><i></i><i></i></span></div>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow rv" data-i18n="tm.k">Team Flying Fish</div>
+      <h2 class="h-xl rv d1" data-i18n="tm.h">The Rosarian<br>who <em>flies</em> on water.</h2>
+      <p class="lead rv d2" data-i18n="tm.p">Grew up paddling the Paraná River. Today he races for Argentina — and does it on a Flying Fish.</p>
+      <div class="medals">
+        <div class="medal rv d1"><div class="disc">AU</div><div><h5 data-i18n="m1.h">Gold · Sprint</h5><p data-i18n="m1.p">South American Games · Santa Fe 2026</p></div></div>
+        <div class="medal rv d2"><div class="disc">AU</div><div><h5 data-i18n="m2.h">Gold · Technical Race</h5><p data-i18n="m2.p">South American Games · Santa Fe 2026 · 18:43.37</p></div></div>
+        <div class="medal rv d3"><div class="disc bz">BR</div><div><h5 data-i18n="m3.h">Bronze</h5><p data-i18n="m3.p">Pan American Games · Santiago 2023</p></div></div>
+        <div class="medal rv d4"><div class="disc go">→</div><div><h5 data-i18n="m4.h">Qualified · Lima 2027</h5><p data-i18n="m4.p">Pan American Games · next stop</p></div></div>
+      </div>
+      <div class="team-cta rv">
+        <a class="btn btn-ghost" href="https://www.instagram.com/santibasa4/" target="_blank" rel="noopener">@santibasa4</a>
+        <a class="btn btn-ghost" href="https://www.instagram.com/flying_fish_board_co/" target="_blank" rel="noopener">@flying_fish_board_co</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="block" id="contact">
+  <div class="eyebrow rv" style="justify-content:center" data-i18n="ct.k">Your turn</div>
+  <h2 class="h-xl rv d1" data-i18n="ct.h">Find your<br><em>glide.</em></h2>
+  <p class="lead rv d2" data-i18n="ct.p">Tell us how you paddle, where, and how fast you want to go. We'll shape the rest.</p>
+  <div class="ctas rv d3">
+    <a class="btn btn-hot" href="https://www.flyingfishboardco.com/" target="_blank" rel="noopener" data-i18n="ct.cta1">Start a custom order</a>
+    <a class="btn btn-ghost" href="https://www.instagram.com/flying_fish_board_co/" target="_blank" rel="noopener">Instagram</a>
+  </div>
+</section>
+
+<footer>
+  <a href="#hero" class="brand"><svg viewBox="-1.1 -1.1 2.2 2.2" class="fish-mark" aria-hidden="true"></svg><span>FLYING FISH<small>Board Co.</small></span></a>
+  <nav>
+    <a href="#lineup" data-i18n="nav.lineup">Line-up</a>
+    <a href="#build" data-i18n="nav.build">Build yours</a>
+    <a href="#tech" data-i18n="nav.tech">Tech</a>
+    <a href="#team" data-i18n="nav.team">Team</a>
+  </nav>
+  <span data-i18n="ft">Stuart, Florida · Handcrafted SUP</span>
+</footer>
+
+<script>
+(() => {
+'use strict';
+
+/* =========================================================
+   i18n
+   ========================================================= */
+const I18N = {
+  en: {
+    'nav.lineup':'Line-up','nav.build':'Build yours','nav.tech':'Tech','nav.team':'Team','nav.cta':'Build yours',
+    'c1.k':'The deep','c1.h':'Born in<br>the <em>water.</em>','c1.p':'Every Flying Fish starts the same way: below the surface, shaped for one paddler.',
+    'c2.k':'Breach','c2.h':'Breaks the<br>surface.<br><em>Takes flight.</em>',
+    'c3.k':'Transform','c3.h':'Becomes<br>a <em>board.</em>','c3.p':'Closed-cell foam, wrapped in carbon fiber, tinted in resin to your spec.',
+    'final.sub':'Handcrafted in Stuart, Florida · <b>#FINDYOURGLIDE</b>','final.cta1':'Build your board','final.cta2':'Meet the team',
+    'hint':'Scroll','hud.1':'DEEP','hud.2':'BREACH','hud.3':'FLIGHT','hud.4':'BOARD',
+    'lu.k':'The line-up','lu.h':'One school.<br><em>Every water.</em>','lu.p':'From flatwater sprints to open-ocean downwinders. Every shape is built to order — your weight, your water, your glide.',
+    'b.k':'Custom shop','b.h':'Tint it.<br><em>Name it.</em> Own it.','b.p':'Every board is custom made for its paddler and finished with a custom color resin tint. Play with the shape and color — then send it to the shop.',
+    'b.model':'Model','b.shape':'Shape','b.tint':'Resin tint','b.pad':'Deck pad','b.name':'Name on the board','b.cta':'Send to the shop',
+    'b.note':'Illustrative silhouettes. Final shape, volume and color are confirmed with the shaper.',
+    't.k':'Anatomy of a glide','t.h':'Light.<br>Stiff.<br><em>Alive.</em>','t.p':'Shaped from closed-cell foam, wrapped in carbon fiber and finished with custom tinted resin. Nothing extra — every gram is there to make you faster.',
+    't.s1':'Shaped','t.s2':'Wrapped','t.s3':'Tinted',
+    'tm.rider':'Team rider','tm.k':'Team Flying Fish','tm.h':'The Rosarian<br>who <em>flies</em> on water.',
+    'tm.p':'Grew up paddling the Paraná River. Today he races for Argentina — and does it on a Flying Fish.',
+    'm1.h':'Gold · Sprint','m1.p':'South American Games · Santa Fe 2026',
+    'm2.h':'Gold · Technical Race','m2.p':'South American Games · Santa Fe 2026 · 18:43.37',
+    'm3.h':'Bronze','m3.p':'Pan American Games · Santiago 2023',
+    'm4.h':'Qualified · Lima 2027','m4.p':'Pan American Games · next stop',
+    'ct.k':'Your turn','ct.h':'Find your<br><em>glide.</em>','ct.p':'Tell us how you paddle, where, and how fast you want to go. We\'ll shape the rest.',
+    'ct.cta1':'Start a custom order','ft':'Stuart, Florida · Handcrafted SUP',
+    mq:['FIND YOUR GLIDE','HANDCRAFTED IN FLORIDA','CARBON · FOAM · RESIN','BUILT FOR ONE PADDLER'],
+    layers:[['Custom resin tint','Your color, sealed in'],['Carbon fiber wrap','Stiffness without weight'],['Closed-cell foam core','Hand shaped, zero water uptake'],['Deck pad','Grip where you stand'],['Race fin','Tracks straight, releases clean']],
+  },
+  es: {
+    'nav.lineup':'Modelos','nav.build':'Armá la tuya','nav.tech':'Tecnología','nav.team':'Team','nav.cta':'Armá la tuya',
+    'c1.k':'Lo profundo','c1.h':'Nace en<br>el <em>agua.</em>','c1.p':'Cada Flying Fish empieza igual: bajo la superficie, hecha para un solo remador.',
+    'c2.k':'Salto','c2.h':'Rompe la<br>superficie.<br><em>Y vuela.</em>',
+    'c3.k':'Transformación','c3.h':'Se convierte<br>en <em>tabla.</em>','c3.p':'Núcleo de espuma de celda cerrada, envuelto en fibra de carbono y teñido en resina a tu medida.',
+    'final.sub':'Hecha a mano en Stuart, Florida · <b>#FINDYOURGLIDE</b>','final.cta1':'Armá tu tabla','final.cta2':'Conocé al team',
+    'hint':'Deslizá','hud.1':'FONDO','hud.2':'SALTO','hud.3':'VUELO','hud.4':'TABLA',
+    'lu.k':'Los modelos','lu.h':'Una escuela.<br><em>Toda el agua.</em>','lu.p':'De sprints en agua plana a downwinds en mar abierto. Cada shape se hace a pedido: tu peso, tu agua, tu glide.',
+    'b.k':'Taller custom','b.h':'Teñila.<br><em>Nombrala.</em> Es tuya.','b.p':'Cada tabla se hace a medida de su remador y se termina con un tinte de resina del color que elijas. Jugá con el shape y el color, y mandala al taller.',
+    'b.model':'Modelo','b.shape':'Shape','b.tint':'Tinte de resina','b.pad':'Pad','b.name':'Nombre en la tabla','b.cta':'Mandar al taller',
+    'b.note':'Siluetas ilustrativas. Shape, volumen y color final se confirman con el shaper.',
+    't.k':'Anatomía del glide','t.h':'Liviana.<br>Rígida.<br><em>Viva.</em>','t.p':'Shapeada en espuma de celda cerrada, envuelta en fibra de carbono y terminada con resina teñida a medida. Nada de más: cada gramo está para que vayas más rápido.',
+    't.s1':'Shapeada','t.s2':'Laminada','t.s3':'Teñida',
+    'tm.rider':'Team rider','tm.k':'Team Flying Fish','tm.h':'El rosarino<br>que <em>vuela</em> sobre el agua.',
+    'tm.p':'Creció remando en el Paraná. Hoy compite por Argentina, y lo hace arriba de una Flying Fish.',
+    'm1.h':'Oro · Sprint','m1.p':'Juegos Suramericanos · Santa Fe 2026',
+    'm2.h':'Oro · Carrera técnica','m2.p':'Juegos Suramericanos · Santa Fe 2026 · 18:43.37',
+    'm3.h':'Bronce','m3.p':'Juegos Panamericanos · Santiago 2023',
+    'm4.h':'Clasificado · Lima 2027','m4.p':'Juegos Panamericanos · próxima parada',
+    'ct.k':'Tu turno','ct.h':'Encontrá tu<br><em>glide.</em>','ct.p':'Contanos cómo remás, dónde y qué tan rápido querés ir. Del resto nos encargamos nosotros.',
+    'ct.cta1':'Pedir una tabla custom','ft':'Stuart, Florida · SUP hecho a mano',
+    mq:['FIND YOUR GLIDE','HECHAS A MANO EN FLORIDA','CARBONO · ESPUMA · RESINA','UNA TABLA, UN REMADOR'],
+    layers:[['Tinte de resina custom','Tu color, sellado'],['Envoltura de fibra de carbono','Rigidez sin peso'],['Núcleo de espuma de celda cerrada','Shapeado a mano, no absorbe agua'],['Pad','Agarre donde pisás'],['Quilla de race','Va derecha, suelta limpia']],
+  }
+};
+let LANG = 'en';
+try { const s = localStorage.getItem('ff-lang'); if (s && I18N[s]) LANG = s; else if ((navigator.language||'').toLowerCase().startsWith('es')) LANG = 'es'; } catch(e) {}
+function applyLang(l){
+  LANG = l; document.documentElement.lang = l;
+  document.querySelectorAll('[data-i18n]').forEach(el => { const v = I18N[l][el.dataset.i18n]; if (v != null) el.innerHTML = v; });
+  document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('on', b.dataset.lang === l));
+  buildMarquee(); buildExplode(); renderCards(); renderConfigLabels();
+  try { localStorage.setItem('ff-lang', l); } catch(e) {}
+}
+document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => applyLang(b.dataset.lang)));
+
+/* =========================================================
+   Math + geometry
+   ========================================================= */
+const clamp = (v,a=0,b=1) => Math.min(b, Math.max(a, v));
+const lerp = (a,b,t) => a + (b-a)*t;
+const ss = (a,b,v) => { const t = clamp((v-a)/(b-a)); return t*t*(3-2*t); };
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+const N = 96; // points per side (nose -> tail), both shapes share the parametrization so they can morph
+
+/* Top-down flying fish, nose at y=-1 */
+function fishSide(){
+  const P = [];
+  for (let i = 0; i <= N; i++){
+    const s = i/N; let x, y;
+    if (s <= .78){ const t = s/.78; y = -1 + t*1.52; x = .03*t + .155*Math.sin(Math.PI*Math.pow(t,.62)); }
+    else {
+      const u = (s-.78)/.22;
+      if (u < .62){ const k = u/.62; x = lerp(.03,.25,Math.pow(k,1.25)); y = lerp(.52,1.0,k); }
+      else { const k = (u-.62)/.38; x = lerp(.25,0,k); y = lerp(1.0,.8,Math.pow(k,.7)); }
+    }
+    P.push([x,y]);
+  }
+  return P;
+}
+/* Top-down SUP board. o = {w: half width, tail: tail half width, nose: nose exponent, max: widest point, sq: tail squareness} */
+function boardSide(o){
+  const P = [];
+  for (let i = 0; i <= N; i++){
+    const s = i/N; let x, y;
+    if (s <= .8){
+      const t = s/.8; y = -1 + t*1.72;
+      x = t < o.max ? o.w*Math.pow(Math.sin(Math.PI/2*t/o.max), o.nose)
+                    : o.w - (o.w-o.tail)*Math.pow((t-o.max)/(1-o.max), 1.8);
+    } else {
+      const a = (s-.8)/.2*Math.PI/2;
+      x = o.tail*Math.pow(Math.cos(a), o.sq); y = .72 + .25*Math.pow(Math.sin(a), o.sq);
+    }
+    P.push([x,y]);
+  }
+  return P;
+}
+const SHAPES = {
+  race:  {w:.143, tail:.075, nose:.95, max:.58, sq:.8},
+  wide:  {w:.165, tail:.09,  nose:.85, max:.56, sq:.7},
+  glide: {w:.15,  tail:.09,  nose:.75, max:.54, sq:.6},
+  light: {w:.18,  tail:.12,  nose:.6,  max:.52, sq:.45},
+  daily: {w:.2,   tail:.14,  nose:.5,  max:.5,  sq:.35},
+};
+const FISH = fishSide();
+const HERO_BOARD = boardSide(SHAPES.race);
+
+/* horizontal SVG path (nose to the right) */
+function svgPath(side){
+  let d = '';
+  side.forEach(([x,y],i) => d += (i ? 'L' : 'M') + (-y).toFixed(4) + ' ' + x.toFixed(4));
+  for (let i = side.length-1; i >= 0; i--) d += 'L' + (-side[i][1]).toFixed(4) + ' ' + (-side[i][0]).toFixed(4);
+  return d + 'Z';
+}
+/* Logo mark: fish silhouette + wings */
+function fishMarkSVG(){
+  let d = '';
+  FISH.forEach(([x,y],i) => d += (i?'L':'M') + x.toFixed(3) + ' ' + y.toFixed(3));
+  for (let i = N; i >= 0; i--) d += 'L' + (-FISH[i][0]).toFixed(3) + ' ' + FISH[i][1].toFixed(3);
+  d += 'Z';
+  const wing = s => `M${.08*s} -.56 Q${.55*s} -.66 ${1.0*s} -.1 Q${.5*s} .02 ${.08*s} -.16Z`;
+  return `<defs><linearGradient id="fmg" x1="0" y1="-1" x2="0" y2="1"><stop offset="0" stop-color="#19e3ff"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs>
+    <path d="${wing(1)}" fill="#19e3ff" opacity=".55"/><path d="${wing(-1)}" fill="#19e3ff" opacity=".55"/>
+    <path d="${d}" fill="url(#fmg)"/>`;
+}
+document.querySelectorAll('.fish-mark').forEach(s => s.innerHTML = fishMarkSVG());
+
+/* =========================================================
+   HERO: canvas scroll scene
+   ========================================================= */
+const hero = document.getElementById('hero');
+const bg = document.getElementById('bg'), fg = document.getElementById('fg');
+const bctx = bg.getContext('2d'), fctx = fg.getContext('2d');
+const bigtitle = document.getElementById('bigtitle');
+const caps = [...document.querySelectorAll('.cap')].map(el => ({el, w: el.dataset.win.split(',').map(Number)}));
+const finalEl = document.getElementById('final'), hint = document.getElementById('hint');
+const hudItems = [...document.querySelectorAll('#hud div')];
+let W = 0, H = 0, DPR = 1;
+const HAS_FILTER = 'filter' in fctx;
+
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const r = bg.getBoundingClientRect(); W = r.width; H = r.height;
+  [bg, fg].forEach(c => { c.width = Math.round(W*DPR); c.height = Math.round(H*DPR); });
+}
+
+/* Caustics texture: tileable Worley F2-F1 */
+const caustic = (() => {
+  const S = 256, cv = document.createElement('canvas'); cv.width = cv.height = S;
+  const g = cv.getContext('2d'), img = g.createImageData(S,S), r = rng(7), pts = [];
+  for (let i = 0; i < 26; i++) pts.push([r()*S, r()*S]);
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++){
+    let f1 = 1e9, f2 = 1e9;
+    for (const p of pts){
+      let dx = Math.abs(x-p[0]); if (dx > S/2) dx = S-dx;
+      let dy = Math.abs(y-p[1]); if (dy > S/2) dy = S-dy;
+      const d = dx*dx + dy*dy;
+      if (d < f1){ f2 = f1; f1 = d; } else if (d < f2) f2 = d;
+    }
+    const v = Math.sqrt(f2) - Math.sqrt(f1);
+    const c = Math.pow(clamp(1 - v/12), 4);
+    const o = (y*S + x)*4; img.data[o] = 170; img.data[o+1] = 240; img.data[o+2] = 255; img.data[o+3] = c*255;
+  }
+  g.putImageData(img, 0, 0); return cv;
+})();
+let cPat = null;
+
+/* Carbon weave pattern */
+const carbon = (() => {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 8; const g = cv.getContext('2d');
+  g.fillStyle = '#0d1116'; g.fillRect(0,0,8,8);
+  g.fillStyle = '#1d242c'; g.fillRect(0,0,4,4); g.fillRect(4,4,4,4);
+  g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(0,0,4,1); g.fillRect(4,4,1,4);
+  return cv;
+})();
+let carbonPat = null;
+
+/* Trajectory keyframes (normalized screen coordinates) */
+const KF = [
+  {p:0.00, x:.12, y:.96}, {p:0.12, x:.18, y:.78}, {p:0.26, x:.28, y:.60},
+  {p:0.40, x:.40, y:.36}, {p:0.52, x:.46, y:.40}, {p:0.64, x:.50, y:.50}, {p:1.00, x:.50, y:.50},
+];
+function cr(p0,p1,p2,p3,t){ const t2=t*t, t3=t2*t; return .5*((2*p1)+(-p0+p2)*t+(2*p0-5*p1+4*p2-p3)*t2+(-p0+3*p1-3*p2+p3)*t3); }
+function pathAt(p){
+  p = clamp(p); let i = 0; while (i < KF.length-2 && p > KF[i+1].p) i++;
+  const a = KF[Math.max(0,i-1)], b = KF[i], c = KF[i+1], d = KF[Math.min(KF.length-1,i+2)];
+  const t = clamp((p-b.p)/(c.p-b.p));
+  return [cr(a.x,b.x,c.x,d.x,t), cr(a.y,b.y,c.y,d.y,t)];
+}
+function headingAt(p){
+  p = Math.min(p, .6);
+  const [x1,y1] = pathAt(p-.01), [x2,y2] = pathAt(p+.01);
+  return Math.atan2((y2-y1)*H, (x2-x1)*W) + Math.PI/2; // fish nose is -y
+}
+function angLerp(a,b,t){ let d = ((b-a+Math.PI*3) % (Math.PI*2)) - Math.PI; return a + d*t; }
+
+const P_BREACH = .265;
+const DROPS = (() => { const r = rng(42), a = []; for (let i = 0; i < 56; i++) a.push({a:r()*Math.PI*2, v:.35+r()*.9, s:1+r()*3.2, d:r()*.25}); return a; })();
+const GLINTS = (() => { const r = rng(9), a = []; for (let i = 0; i < 70; i++) a.push({x:r(), y:r(), ph:r()*6.28, s:.6+r()*1.6, sp:.6+r()*1.4}); return a; })();
+
+function tracePts(c, pts){
+  c.beginPath();
+  for (let i = 0; i < pts.length; i++){ const q = pts[i]; i ? c.lineTo(q[0]+q[2], q[1]) : c.moveTo(q[0]+q[2], q[1]); }
+  for (let i = pts.length-1; i >= 0; i--){ const q = pts[i]; c.lineTo(-q[0]+q[2], q[1]); }
+  c.closePath();
+}
+function wingPath(c, s, ws){
+  const tipX = (.1 + .9*ws)*s, tipY = -.18 + .1*ws;
+  c.beginPath(); c.moveTo(.08*s, -.58);
+  c.quadraticCurveTo((.12+.5*ws)*s, -.7 + .02*ws, tipX, tipY);
+  c.quadraticCurveTo((.1+.42*ws)*s, .04, .08*s, -.14); c.closePath();
+}
+function pelvicPath(c, s, ws){
+  c.beginPath(); c.moveTo(.04*s, .22);
+  c.quadraticCurveTo((.12+.2*ws)*s, .24, (.08+.3*ws)*s, .5);
+  c.quadraticCurveTo((.06+.1*ws)*s, .42, .03*s, .38); c.closePath();
+}
+
+/* Draw the fish/board creature. st: x,y,rot,sc,m (morph 0..1),ws (wing spread),sw (swim),t,shadow */
+function drawCreature(c, st){
+  const {m, ws, sw, t} = st;
+  const e = m < .5 ? 4*m*m*m : 1 - Math.pow(-2*m+2, 3)/2;
+  const pts = new Array(N+1);
+  for (let i = 0; i <= N; i++){
+    const f = FISH[i], b = HERO_BOARD[i];
+    const y = lerp(f[1], b[1], e);
+    const bend = Math.sin(y*3.1 - t*9) * .06 * sw * ((y+1)/2) * (1-e);
+    pts[i] = [lerp(f[0], b[0], e), y, bend];
+  }
+  c.save(); c.translate(st.x, st.y); c.rotate(st.rot); c.scale(st.sc, st.sc);
+
+  const fishA = 1 - ss(.05, .7, m);
+  if (st.shadow){
+    c.fillStyle = st.shadow;
+    if (ws > .02 && fishA > 0){ c.globalAlpha = fishA; [1,-1].forEach(s => { wingPath(c,s,ws); c.fill(); pelvicPath(c,s,ws); c.fill(); }); c.globalAlpha = 1; }
+    tracePts(c, pts); c.fill(); c.restore(); return;
+  }
+
+  /* wings (under body) */
+  if (ws > .01 && fishA > 0){
+    [1,-1].forEach(s => {
+      const g = c.createLinearGradient(0, -.6, s*(.1+.9*ws), -.1);
+      g.addColorStop(0, 'rgba(120,200,255,.75)'); g.addColorStop(1, 'rgba(25,227,255,.22)');
+      c.globalAlpha = fishA; c.fillStyle = g; wingPath(c, s, ws); c.fill();
+      c.strokeStyle = 'rgba(210,245,255,.55)'; c.lineWidth = 1/st.sc; c.stroke();
+      c.beginPath();
+      for (let k = 1; k <= 7; k++){
+        const q = k/8, tx = lerp((.1+.9*ws)*s, (.1+.35*ws)*s, q), ty = lerp(-.18+.1*ws, -.02, q);
+        c.moveTo(.09*s, -.5 + q*.25); c.lineTo(tx, ty);
+      }
+      c.strokeStyle = 'rgba(200,240,255,.28)'; c.stroke();
+      c.fillStyle = 'rgba(120,200,255,.5)'; pelvicPath(c, s, ws); c.fill();
+    });
+    c.globalAlpha = 1;
+  }
+
+  /* body: fish skin -> carbon + tinted resin */
+  tracePts(c, pts);
+  if (fishA > 0){
+    const g = c.createLinearGradient(-.2, 0, .2, 0);
+    g.addColorStop(0, '#b8d6f0'); g.addColorStop(.28, '#2459a0'); g.addColorStop(.5, '#0b2350'); g.addColorStop(.72, '#2459a0'); g.addColorStop(1, '#b8d6f0');
+    c.globalAlpha = fishA; c.fillStyle = g; c.fill();
+  }
+  if (m > 0){
+    c.globalAlpha = ss(.2, .8, m);
+    if (carbonPat && carbonPat.setTransform){ carbonPat.setTransform(new DOMMatrix().scale(1.4/st.sc)); c.fillStyle = carbonPat; c.fill(); }
+    const g = c.createLinearGradient(0, -1, 0, 1);
+    g.addColorStop(0, 'rgba(25,227,255,.92)'); g.addColorStop(.45, 'rgba(47,107,255,.86)'); g.addColorStop(1, 'rgba(12,30,90,.9)');
+    c.fillStyle = g; c.fill();
+  }
+  c.globalAlpha = 1;
+
+  /* fish details */
+  if (fishA > .01){
+    c.globalAlpha = fishA;
+    c.beginPath(); c.moveTo(pts[6][2], -.9);
+    for (let i = 8; i < N*.78; i += 4) c.lineTo(pts[i][2], pts[i][1]);
+    c.strokeStyle = 'rgba(25,227,255,.55)'; c.lineWidth = 2/st.sc; c.stroke();
+    [1,-1].forEach(s => {
+      c.beginPath(); c.arc(s*.075 + pts[10][2], -.83, .032, 0, Math.PI*2); c.fillStyle = '#02070d'; c.fill();
+      c.beginPath(); c.arc(s*.075 + pts[10][2] - .008, -.84, .01, 0, Math.PI*2); c.fillStyle = '#fff'; c.fill();
+    });
+    c.globalAlpha = 1;
+  }
+
+  /* board details */
+  const d = ss(.55, 1, m);
+  if (d > .01){
+    c.globalAlpha = d;
+    tracePts(c, pts); c.strokeStyle = 'rgba(234,246,255,.55)'; c.lineWidth = 1.5/st.sc; c.stroke();
+    // deck pad (race standing area)
+    const px = .105, y0 = .02, y1 = .56, r = .04;
+    c.beginPath(); c.moveTo(-px+r, y0); c.lineTo(px-r, y0); c.quadraticCurveTo(px, y0, px, y0+r); c.lineTo(px*.8, y1-r);
+    c.quadraticCurveTo(px*.8, y1, px*.8-r, y1); c.lineTo(-px*.8+r, y1); c.quadraticCurveTo(-px*.8, y1, -px*.8, y1-r); c.lineTo(-px, y0+r); c.quadraticCurveTo(-px, y0, -px+r, y0);
+    c.fillStyle = '#081019'; c.fill();
+    c.save(); c.clip(); c.strokeStyle = 'rgba(234,246,255,.07)'; c.lineWidth = 1/st.sc; c.beginPath();
+    for (let yy = y0 + .015; yy < y1; yy += .018){ c.moveTo(-px, yy); c.lineTo(px, yy); } c.stroke(); c.restore();
+    // kick bump + leash plug
+    c.fillStyle = 'rgba(25,227,255,.8)'; c.fillRect(-.07, .5, .14, .012);
+    c.beginPath(); c.arc(0, .9, .014, 0, Math.PI*2); c.fillStyle = '#02070d'; c.fill();
+    // center line
+    c.beginPath(); c.moveTo(0, -.96); c.lineTo(0, 0); c.strokeStyle = 'rgba(234,246,255,.18)'; c.lineWidth = 1/st.sc; c.stroke();
+    // logo along the nose
+    c.save(); c.translate(0, -.44); c.rotate(-Math.PI/2); c.scale(.001, .001);
+    c.font = 'italic 900 62px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillStyle = 'rgba(234,246,255,.95)'; c.fillText('FLYING FISH', 0, 0); c.restore();
+    // sheen sweep
+    c.save(); tracePts(c, pts); c.clip();
+    const sy = ((t*.35) % 2.6) - 1.3, sg = c.createLinearGradient(0, sy-.3, .1, sy+.3);
+    sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(.5, 'rgba(255,255,255,.28)'); sg.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = sg; c.fillRect(-.5, -1.1, 1, 2.2); c.restore();
+    c.globalAlpha = 1;
+  }
+  c.restore();
+}
+
+let pT = 0, pS = 0, t0 = performance.now(), running = true;
+function heroProgress(){
+  const r = hero.getBoundingClientRect();
+  return clamp(-r.top / (r.height - innerHeight));
+}
+
+function frame(now){
+  if (!running) return;
+  const t = REDUCED ? 0 : (now - t0) / 1000;
+  pT = heroProgress();
+  pS += (pT - pS) * (REDUCED ? 1 : .12);
+  if (Math.abs(pT - pS) < .0002) pS = pT;
+  const p = pS;
+  render(p, t);
+  requestAnimationFrame(frame);
+}
+
+function render(p, t){
+  const portrait = H > W * 1.05;
+  const surf = ss(.14, .3, p);
+
+  /* ---------- background water ---------- */
+  bctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const g = bctx.createRadialGradient(W*.5, H*.45, 0, W*.5, H*.5, Math.hypot(W,H)*.65);
+  g.addColorStop(0, `rgb(${lerp(6,14,surf)|0},${lerp(42,92,surf)|0},${lerp(64,122,surf)|0})`);
+  g.addColorStop(.55, `rgb(${lerp(3,6,surf)|0},${lerp(20,46,surf)|0},${lerp(34,70,surf)|0})`);
+  g.addColorStop(1, '#020a11');
+  bctx.fillStyle = g; bctx.fillRect(0, 0, W, H);
+
+  if (!cPat) cPat = bctx.createPattern(caustic, 'repeat');
+  const cs = Math.max(W, H) / 256 * .9;
+  bctx.globalCompositeOperation = 'lighter';
+  [[.06 + .12*surf, t*14, t*9, cs], [.04 + .08*surf, -t*11, t*6, cs*1.35]].forEach(([a, ox, oy, s]) => {
+    bctx.save(); bctx.globalAlpha = a;
+    bctx.translate(((ox % (256*s)) + 256*s) % (256*s) - 256*s, ((oy % (256*s)) + 256*s) % (256*s) - 256*s);
+    bctx.scale(s, s); bctx.fillStyle = cPat; bctx.fillRect(0, 0, W/s + 512, H/s + 512); bctx.restore();
+  });
+  // sun glints once near the surface
+  if (surf > .01){
+    for (const gl of GLINTS){
+      const a = Math.pow(Math.max(0, Math.sin(t*gl.sp*2 + gl.ph)), 10) * surf;
+      if (a < .02) continue;
+      const x = gl.x*W, y = ((gl.y*H + t*6*gl.sp) % H), s = gl.s * 6;
+      bctx.globalAlpha = a; bctx.fillStyle = '#eaf6ff';
+      bctx.beginPath(); bctx.moveTo(x, y-s); bctx.lineTo(x+s*.18, y); bctx.lineTo(x, y+s); bctx.lineTo(x-s*.18, y); bctx.closePath(); bctx.fill();
+      bctx.beginPath(); bctx.moveTo(x-s, y); bctx.lineTo(x, y+s*.18); bctx.lineTo(x+s, y); bctx.lineTo(x, y-s*.18); bctx.closePath(); bctx.fill();
+    }
+  }
+  bctx.globalCompositeOperation = 'source-over'; bctx.globalAlpha = 1;
+  // spotlight behind the final board
+  const fin = ss(.72, .95, p);
+  if (fin > 0){
+    const sg = bctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W,H)*.5);
+    sg.addColorStop(0, `rgba(25,227,255,${.22*fin})`); sg.addColorStop(1, 'rgba(25,227,255,0)');
+    bctx.fillStyle = sg; bctx.fillRect(0, 0, W, H);
+  }
+  // vignette
+  const vg = bctx.createRadialGradient(W/2, H/2, Math.min(W,H)*.35, W/2, H/2, Math.hypot(W,H)*.6);
+  vg.addColorStop(0, 'rgba(2,10,17,0)'); vg.addColorStop(1, 'rgba(2,10,17,.75)');
+  bctx.fillStyle = vg; bctx.fillRect(0, 0, W, H);
+
+  /* ---------- creature ---------- */
+  fctx.setTransform(DPR, 0, 0, DPR, 0, 0); fctx.clearRect(0, 0, W, H);
+  if (!carbonPat) carbonPat = fctx.createPattern(carbon, 'repeat');
+
+  const u = 1 - ss(.2, .27, p);                               // underwater
+  const h = ss(.27, .4, p) * (1 - .55*ss(.55, .8, p));        // height above water
+  const m = ss(.6, .84, p);                                    // morph
+  const settle = ss(.58, .86, p);
+  let ws = Math.max(ss(.27, .34, p), .14*u) * (1 - ss(.56, .7, p));
+  if (h > .2) ws *= 1 + .035*Math.sin(t*24);
+  const sw = u*(1 + .6*Math.sin(t*.8)) + .25*(1-u)*(1-m);
+
+  let [nx, ny] = pathAt(p);
+  if (p < .02) { nx += Math.sin(t*.9)*.01; ny += Math.cos(t*.7)*.008; }
+  let x = nx*W, y = ny*H;
+  if (portrait) y -= settle*H*.07;
+  const L = portrait ? Math.min(H*.54, W*3) : Math.min(W*.74, H*2.3);
+  const base = Math.min(W, H) * (portrait ? .36 : .3);
+  const fishSc = base * (.5 + .18*ss(0, .26, p) + .5*h);
+  const sc = lerp(fishSc, L/2, settle);
+  const finalRot = portrait ? 0 : Math.PI/2;
+  let rot = angLerp(headingAt(p), finalRot, settle);
+  if (p < .27) rot += Math.sin(t*1.7)*.05*u;
+  const bob = settle * Math.sin(t*1.2) * 6;
+  y += bob; rot += settle * Math.sin(t*.9) * .012;
+
+  // splash (breach): rings + droplets
+  const age = (p - P_BREACH) / .16;
+  if (age > 0 && age < 1){
+    const [bx, by] = pathAt(P_BREACH), cx = bx*W, cy = by*H, R = Math.min(W,H)*.32;
+    for (let k = 0; k < 3; k++){
+      const a = clamp(age*1.25 - k*.12); if (a <= 0 || a >= 1) continue;
+      fctx.beginPath(); fctx.ellipse(cx, cy, R*a, R*a*.92, 0, 0, Math.PI*2);
+      fctx.strokeStyle = `rgba(234,246,255,${(1-a)*.55})`; fctx.lineWidth = 2 + (1-a)*5; fctx.stroke();
+    }
+    for (const d of DROPS){
+      const a = clamp((age - d.d) / (1 - d.d)); if (a <= 0 || a >= 1) continue;
+      const k = 1 - Math.pow(1-a, 3), r = d.v*R*k;
+      fctx.globalAlpha = (1-a) * .9; fctx.fillStyle = '#eaf6ff';
+      fctx.beginPath(); fctx.arc(cx + Math.cos(d.a)*r, cy + Math.sin(d.a)*r, d.s*(1 + (1-a)), 0, Math.PI*2); fctx.fill();
+    }
+    fctx.globalAlpha = 1;
+    const fl = Math.max(0, 1 - age*3);
+    if (fl > 0){ const fg2 = fctx.createRadialGradient(cx, cy, 0, cx, cy, R*.6); fg2.addColorStop(0, `rgba(234,246,255,${.45*fl})`); fg2.addColorStop(1, 'rgba(234,246,255,0)'); fctx.fillStyle = fg2; fctx.fillRect(cx-R, cy-R, R*2, R*2); }
+  }
+  // spray trail while flying
+  if (h > .05 && m < .5){
+    for (let k = 1; k <= 14; k++){
+      const pk = p - k*.006; if (pk < P_BREACH) break;
+      const [tx, ty] = pathAt(pk), a = (1 - k/15) * h * (1 - m*2);
+      fctx.globalAlpha = a*.7; fctx.fillStyle = '#eaf6ff';
+      fctx.beginPath(); fctx.arc(tx*W + Math.sin(k*9.1)*8, ty*H + Math.cos(k*5.3)*8 + k*1.5, 1.2 + (k%3), 0, Math.PI*2); fctx.fill();
+    }
+    fctx.globalAlpha = 1;
+  }
+
+  const st = {x, y, rot, sc, m, ws, sw, t};
+  // shadow on the water (grows with height)
+  const shOff = (h*70 + settle*12), shA = .16 + .2*(1-u) - .08*settle;
+  drawCreature(fctx, {...st, x: x + shOff*.6, y: y + shOff, sc: sc*(1 - .06*h), shadow: `rgba(0,6,12,${shA})`});
+  if (HAS_FILTER && u > .02){ fctx.filter = `blur(${(u*3.5).toFixed(1)}px)`; }
+  fctx.globalAlpha = 1 - .35*u;
+  if (settle > .5){ fctx.shadowColor = `rgba(25,227,255,${.45*fin})`; fctx.shadowBlur = 50*fin; }
+  drawCreature(fctx, st);
+  fctx.shadowBlur = 0; fctx.shadowColor = 'transparent'; fctx.filter = 'none'; fctx.globalAlpha = 1;
+  // water veil while submerged
+  if (u > .01){
+    fctx.save(); fctx.globalCompositeOperation = 'source-atop'; fctx.fillStyle = `rgba(6,60,84,${.35*u})`; fctx.fillRect(0, 0, W, H); fctx.restore();
+  }
+
+  /* ---------- HTML overlays ---------- */
+  for (const c of caps){
+    const [a, b] = c.w, f = .045;
+    const o = Math.min(a <= 0 ? 1 : ss(a - f, a + f, p), 1 - ss(b - f, b, p));
+    c.el.style.opacity = o.toFixed(3);
+    c.el.style.transform = `translateY(${((1-o)*30).toFixed(1)}px)`;
+  }
+  const bt = ss(.8, .92, p);
+  bigtitle.style.opacity = (bt*.9).toFixed(3);
+  bigtitle.style.transform = `scale(${(1.12 - .12*bt).toFixed(4)})`;
+  const fo = ss(.88, .97, p);
+  finalEl.style.opacity = fo.toFixed(3); finalEl.classList.toggle('live', fo > .5);
+  finalEl.style.transform = `translateY(${((1-fo)*24).toFixed(1)}px)`;
+  hint.style.opacity = (1 - ss(.01, .06, p)).toFixed(3);
+  const phase = p < .24 ? 0 : p < .45 ? 1 : p < .62 ? 2 : 3;
+  hudItems.forEach((el, i) => el.classList.toggle('on', i === phase));
+  hudItems[0].parentNode.style.opacity = (1 - fo).toFixed(3);
+}
+
+resize();
+addEventListener('resize', resize);
+new IntersectionObserver(es => es.forEach(e => {
+  const was = running; running = e.isIntersecting;
+  if (running && !was) requestAnimationFrame(frame);
+}), {rootMargin: '100px'}).observe(hero);
+requestAnimationFrame(frame);
+
+/* =========================================================
+   Nav + progress + reveals
+   ========================================================= */
+const nav = document.getElementById('nav'), prog = document.getElementById('progress');
+function onScroll(){
+  nav.classList.toggle('solid', scrollY > innerHeight * 4.6);
+  const max = document.documentElement.scrollHeight - innerHeight;
+  prog.style.transform = `scaleX(${max > 0 ? scrollY/max : 0})`;
+  explodeUpdate();
+}
+addEventListener('scroll', onScroll, {passive: true});
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold: .15});
+function observeReveals(root = document){ root.querySelectorAll('.rv:not(.in)').forEach(el => io.observe(el)); }
+
+/* =========================================================
+   Marquee
+   ========================================================= */
+function buildMarquee(){
+  const mark = `<svg viewBox="-1.1 -1.1 2.2 2.2" aria-hidden="true">${fishMarkSVG().replace(/url\(#fmg\)/g, '#03121c').replace(/#19e3ff/g, '#03121c')}</svg>`;
+  const seq = I18N[LANG].mq.map(s => `${s}${mark}`).join('');
+  document.getElementById('mq').innerHTML = `<span>${seq}</span><span>${seq}</span>`;
+}
+
+/* =========================================================
+   Board SVG (cards + configurator)
+   ========================================================= */
+const TINTS = [
+  {id:'gulf',   n:'Gulf Stream',  a:'#19e3ff', b:'#2f6bff', o:.9},
+  {id:'sail',   n:'Sailfish',     a:'#3d7bff', b:'#10205e', o:.92},
+  {id:'sunrise',n:'Sunrise',      a:'#ffc24a', b:'#ff4f5e', o:.9},
+  {id:'mangrove',n:'Mangrove',    a:'#5ff0a8', b:'#0f6b5a', o:.88},
+  {id:'raw',    n:'Raw Carbon',   a:'#ffffff', b:'#9db8c9', o:.08},
+];
+const PADS = [{id:'mid', n:'Midnight', c:'#0a1119'}, {id:'foam', n:'Seafoam', c:'#bfeee3'}, {id:'coral', n:'Coral', c:'#ff6a3d'}];
+// EDITAR: modelos reales de Flying Fish (los shapes son aproximaciones ilustrativas)
+const MODELS = [
+  {id:'fp24', n:'Freedom Pro', dim:`14' × 24"`, vol:'307 L', shape:'race', cat:{en:'Race',es:'Race'}, tint:'gulf',
+    d:{en:'Ideal rocker, smooth nose and rails. Commands rough ocean water and leads in flatwater races.', es:'Rocker ideal, nariz y cantos suaves. Domina el mar picado y lidera en agua plana.'}},
+  {id:'fp28', n:'Freedom Pro', dim:`14' × 28"`, vol:'350 L', shape:'wide', cat:{en:'Race',es:'Race'}, tint:'sail',
+    d:{en:'The same race DNA with more platform — speed you can stand on all day.', es:'El mismo ADN de carrera con más plataforma: velocidad para remar todo el día.'}},
+  {id:'fg2', n:'Freeglide V2', dim:null, vol:null, shape:'glide', cat:{en:'Flatwater',es:'Agua plana'}, tint:'mangrove',
+    d:{en:'Built for flatwater paddlers, with improved stability and glide over the original.', es:'Pensada para agua plana, con más estabilidad y glide que la versión original.'}},
+  {id:'gl', n:'Glider', dim:null, vol:null, shape:'light', cat:{en:'Everyday',es:'Todos los días'}, tint:'sunrise',
+    d:{en:'Carbon and fiberglass blend. An ultralight SUP for everyday paddling.', es:'Mezcla de carbono y fibra de vidrio. Una SUP ultraliviana para remar todos los días.'}},
+  {id:'dd', n:'Daily Driver', dim:null, vol:null, shape:'daily', cat:{en:'Recreation',es:'Recreación'}, tint:'raw',
+    d:{en:'The stable, do-it-all board for exploring, fitness and first strokes.', es:'La tabla estable para todo: explorar, entrenar y dar las primeras remadas.'}},
+];
+let uid = 0;
+function boardSVG(model, tintId, padC, name){
+  const id = 'b' + (uid++), tint = TINTS.find(t => t.id === tintId) || TINTS[0];
+  const side = boardSide(SHAPES[model.shape]);
+  const d = svgPath(side);
+  const w = SHAPES[model.shape].w;
+  const padW = Math.min(.105, w*.72);
+  return `<svg viewBox="-1.08 -0.34 2.16 0.68" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${model.n}">
+  <defs>
+    <pattern id="${id}c" width=".03" height=".03" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width=".03" height=".03" fill="#0d1116"/><rect width=".015" height=".015" fill="#1f262e"/><rect x=".015" y=".015" width=".015" height=".015" fill="#1f262e"/>
+    </pattern>
+    <linearGradient id="${id}t" x1="1" y1="0" x2="-1" y2="0"><stop offset="0" stop-color="${tint.a}"/><stop offset="1" stop-color="${tint.b}"/></linearGradient>
+    <linearGradient id="${id}s" x1="0" y1="-1" x2="0" y2="1" gradientUnits="userSpaceOnUse"><stop offset=".3" stop-color="#fff" stop-opacity=".22"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <clipPath id="${id}k"><path d="${d}"/></clipPath>
+  </defs>
+  <path d="${d}" fill="url(#${id}c)"/>
+  <path d="${d}" fill="url(#${id}t)" fill-opacity="${tint.o}" class="tint"/>
+  <g clip-path="url(#${id}k)">
+    <rect x="-.56" y="${-padW}" width=".54" height="${padW*2}" rx=".035" fill="${padC}" class="pad"/>
+    ${Array.from({length: 26}, (_, i) => `<line x1="${(-.55 + i*.02).toFixed(3)}" y1="${-padW}" x2="${(-.55 + i*.02).toFixed(3)}" y2="${padW}" stroke="#fff" stroke-opacity=".07" stroke-width=".004"/>`).join('')}
+    <rect x="-.52" y="${-padW*.7}" width=".012" height="${padW*1.4}" fill="#19e3ff" opacity=".85"/>
+    <line x1="0" y1="0" x2=".96" y2="0" stroke="#fff" stroke-opacity=".18" stroke-width=".004"/>
+    <path d="M-1.2 -.1 L1.2 -.4 L1.2 .1 L-1.2 .4Z" fill="url(#${id}s)"/>
+  </g>
+  <path d="${d}" fill="none" stroke="#eaf6ff" stroke-opacity=".55" stroke-width=".006"/>
+  <text x=".44" y="0" text-anchor="middle" dominant-baseline="central" font-family="system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif" font-weight="900" font-style="italic" font-size="${Math.min(.07, w*.5).toFixed(3)}" fill="#eaf6ff" letter-spacing="-.002">FLYING FISH</text>
+  ${name ? `<text x=".1" y="0" text-anchor="middle" dominant-baseline="central" font-family="ui-monospace,SF Mono,Menlo,Consolas,monospace" font-weight="700" font-size="${Math.min(.04, w*.3).toFixed(3)}" fill="#eaf6ff" fill-opacity=".85" letter-spacing=".01" class="nm">${esc(name)}</text>` : ''}
+  <circle cx="-.95" cy="0" r=".012" fill="#02070d"/>
+</svg>`;
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* Cards */
+function renderCards(){
+  const box = document.getElementById('cards');
+  box.innerHTML = MODELS.filter(m => m.id !== 'fp28').map((m, i) => `
+    <article class="card rv d${i+1}" data-model="${m.id}">
+      <div class="tag"><span>0${i+1}</span><b>${m.cat[LANG]}</b></div>
+      <div class="board-wrap">${boardSVG(m, m.tint, '#0a1119')}</div>
+      <h3>${m.n}</h3>
+      <p>${m.d[LANG]}</p>
+      <div class="specs">${m.dim ? `<span class="chip">${m.dim}</span>` : ''}${m.vol ? `<span class="chip">${m.vol}</span>` : ''}<span class="chip">Carbon</span><span class="chip">Custom</span></div>
+    </article>`).join('');
+  box.querySelectorAll('.card').forEach(c => {
+    c.addEventListener('pointermove', e => {
+      const r = c.getBoundingClientRect(), mx = (e.clientX - r.left) / r.width, my = (e.clientY - r.top) / r.height;
+      c.style.setProperty('--mx', mx*100 + '%'); c.style.setProperty('--my', my*100 + '%');
+      if (!REDUCED) c.style.transform = `perspective(900px) rotateX(${(.5-my)*6}deg) rotateY(${(mx-.5)*8}deg)`;
+    });
+    c.addEventListener('pointerleave', () => c.style.transform = '');
+    c.addEventListener('click', () => { cfg.model = c.dataset.model; cfg.tint = MODELS.find(m => m.id === cfg.model).tint; renderConfig(); document.getElementById('build').scrollIntoView({behavior: REDUCED ? 'auto' : 'smooth'}); });
+    c.style.cursor = 'pointer';
+  });
+  observeReveals(box);
+}
+
+/* Configurator */
+const cfg = {model:'fp24', tint:'gulf', pad:'mid', name:'SANTI'};
+const nm = document.getElementById('nm');
+function renderConfigLabels(){
+  const box = document.getElementById('opt-model');
+  box.innerHTML = MODELS.map(m => `<button class="opt${m.id===cfg.model?' on':''}" data-v="${m.id}">${m.n}<small>${m.dim ? m.dim : m.cat[LANG]}</small></button>`).join('');
+  box.querySelectorAll('.opt').forEach(b => b.onclick = () => { cfg.model = b.dataset.v; renderConfig(); });
+}
+function renderConfig(){
+  renderConfigLabels();
+  const m = MODELS.find(x => x.id === cfg.model), tint = TINTS.find(t => t.id === cfg.tint), pad = PADS.find(p => p.id === cfg.pad);
+  document.getElementById('bench-svg').outerHTML = boardSVG(m, cfg.tint, pad.c, cfg.name).replace('<svg ', '<svg id="bench-svg" ');
+  document.getElementById('bm-name').textContent = m.n;
+  document.getElementById('bm-dim').textContent = m.dim ? m.dim + (m.vol ? ' · ' + m.vol : '') : m.cat[LANG];
+  document.getElementById('tint-name').textContent = tint.n;
+  document.getElementById('pad-name').textContent = pad.n;
+  document.querySelectorAll('#opt-tint .sw').forEach(s => s.classList.toggle('on', s.dataset.v === cfg.tint));
+  document.querySelectorAll('#opt-pad .sw').forEach(s => s.classList.toggle('on', s.dataset.v === cfg.pad));
+  const summary = `Flying Fish ${m.n}${m.dim ? ' ' + m.dim : ''} — tint: ${tint.n}, pad: ${pad.n}, name: ${cfg.name || '-'}`;
+  document.getElementById('order').title = summary;
+}
+document.getElementById('opt-tint').innerHTML = TINTS.map(t => `<button class="sw" data-v="${t.id}" aria-label="${t.n}" title="${t.n}" style="background:${t.id==='raw' ? 'repeating-linear-gradient(45deg,#0d1116 0 4px,#232b34 4px 8px)' : `linear-gradient(135deg,${t.a},${t.b})`}"></button>`).join('');
+document.getElementById('opt-pad').innerHTML = PADS.map(p => `<button class="sw" data-v="${p.id}" aria-label="${p.n}" title="${p.n}" style="background:${p.c}"></button>`).join('');
+document.querySelectorAll('#opt-tint .sw').forEach(s => s.onclick = () => { cfg.tint = s.dataset.v; renderConfig(); });
+document.querySelectorAll('#opt-pad .sw').forEach(s => s.onclick = () => { cfg.pad = s.dataset.v; renderConfig(); });
+nm.addEventListener('input', () => {
+  cfg.name = nm.value.toUpperCase().replace(/[^A-Z0-9ÁÉÍÓÚÑÜ .\-]/g, '').slice(0, 14);
+  document.getElementById('nm-c').textContent = `${cfg.name.length}/14`;
+  renderConfig();
+});
+
+/* =========================================================
+   Tech: exploded layers (side profile)
+   ========================================================= */
+const explode = document.getElementById('explode');
+let layerEls = [];
+const SX = x => 40 + (x+1)*360, SY = y => y*300;
+function sideProfile(top, th, tailLift = .03, noseLift = .16){
+  // x in [-1,1] (tail -> nose); rocker lifts both ends
+  const r = x => x > .55 ? -noseLift*Math.pow((x-.55)/.45, 2.2) : x < -.8 ? -tailLift*Math.pow((-.8-x)/.2, 2) : 0;
+  const S = 60, tp = [], bt = [];
+  for (let i = 0; i <= S; i++){
+    const x = -1 + 2*i/S, taper = x > .8 ? 1 - Math.pow((x-.8)/.2, 1.6)*.85 : x < -.95 ? .6 : 1;
+    tp.push([x, top + r(x)]); bt.push([x, top + r(x) + th*taper]);
+  }
+  const pt = ([x,y]) => SX(x).toFixed(1) + ' ' + SY(y).toFixed(1);
+  return 'M' + tp.map(pt).join('L') + 'L' + bt.reverse().map(pt).join('L') + 'Z';
+}
+function buildExplode(){
+  const L = I18N[LANG].layers;
+  // top -> bottom when exploded: pad, tint, carbon, core, fin (L index)
+  const layers = [
+    {li:3, d:`M${SX(-.9)} ${SY(.3)-10} H${SX(.05)} q8 0 8 5 v5 H${SX(-.9)-8} q0-10 8-10Z`, fill:'#1a2430', ax:-.4},
+    {li:0, d:sideProfile(.3, .012), fill:'url(#tintG)', ax:.25},
+    {li:1, d:sideProfile(.3, .018), fill:'url(#carbP)', ax:.45},
+    {li:2, d:sideProfile(.3, .1), fill:'url(#foamG)', ax:.1},
+    {li:4, d:`M${SX(-.9)} ${SY(.4)} l44 0 l-20 62 q-6 4 -12 0Z`, fill:'#0d1116', ax:-.86},
+  ];
+  explode.innerHTML = `<svg viewBox="0 0 800 560" aria-hidden="true">
+    <defs>
+      <linearGradient id="tintG" x1="0" x2="1"><stop offset="0" stop-color="#2f6bff"/><stop offset="1" stop-color="#19e3ff"/></linearGradient>
+      <linearGradient id="foamG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3f8fb"/><stop offset="1" stop-color="#b9cad6"/></linearGradient>
+      <pattern id="carbP" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#0d1116"/><rect width="4" height="4" fill="#27303a"/><rect x="4" y="4" width="4" height="4" fill="#27303a"/></pattern>
+    </defs>
+    ${layers.map((l, k) => `<g class="ly">
+        <path d="${l.d}" fill="${l.fill}" stroke="rgba(234,246,255,.25)" stroke-width="1"/>
+        <g class="lb" opacity="0"><circle cx="${SX(l.ax)}" cy="${l.li === 4 ? SY(.44) : SY(.3) - 18}" r="15" fill="#03121c" stroke="#19e3ff"/>
+        <text x="${SX(l.ax)}" y="${(l.li === 4 ? SY(.44) : SY(.3) - 18) + 1}" text-anchor="middle" dominant-baseline="central" class="num" style="font-size:14px">0${k+1}</text></g>
+      </g>`).join('')}
+  </svg>
+  <ol class="legend">${layers.map((l, k) => `<li><b>0${k+1}</b><span>${L[l.li][0]}</span><small>${L[l.li][1]}</small></li>`).join('')}</ol>`;
+  layerEls = [...explode.querySelectorAll('.ly')];
+  legendEls = [...explode.querySelectorAll('.legend li')];
+  explodeUpdate();
+}
+let legendEls = [];
+const tech = document.getElementById('tech');
+function explodeUpdate(){
+  if (!layerEls.length) return;
+  const r = tech.getBoundingClientRect();
+  const p = clamp(-r.top / (r.height - innerHeight));
+  const e = ss(.08, .65, p);
+  const gap = 84, center = (layerEls.length - 1) / 2;
+  layerEls.forEach((g, k) => {
+    const dy = (k - center) * gap * e;
+    g.setAttribute('transform', `translate(0 ${(dy + 150).toFixed(1)})`);
+    const on = ss(.3 + k*.08, .38 + k*.08, p);
+    g.querySelector('.lb').setAttribute('opacity', on.toFixed(3));
+    legendEls[k] && legendEls[k].classList.toggle('on', on > .5);
+  });
+}
+
+/* =========================================================
+   Portrait fallback art (river + paddler wake) — replaced by a real photo when present
+   ========================================================= */
+(() => {
+  const box = document.getElementById('portrait');
+  if (box.querySelector('img')) return;
+  const cv = document.getElementById('pcv'), c = cv.getContext('2d');
+  let w = 0, h = 0, vis = false;
+  const sz = () => { const r = cv.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2); w = r.width; h = r.height; cv.width = w*d; cv.height = h*d; c.setTransform(d,0,0,d,0,0); };
+  sz(); addEventListener('resize', sz);
+  new IntersectionObserver(es => { vis = es[0].isIntersecting; if (vis) requestAnimationFrame(draw); }).observe(cv);
+  const board = boardSide(SHAPES.race);
+  function draw(now){
+    if (!vis) return;
+    const t = REDUCED ? 0 : now/1000;
+    const g = c.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#0b4a63'); g.addColorStop(1, '#03121c');
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+    c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = .16;
+    const s = w/256*1.3; c.translate(-((t*10) % (256*s)), -((t*22) % (256*s))); c.scale(s, s);
+    c.fillStyle = c.createPattern(caustic, 'repeat'); c.fillRect(0, 0, w/s + 512, h/s + 512); c.restore();
+    // board heading up the frame with a wake
+    const bx = w*.42, by = h*.56, L = h*.62;
+    for (let k = 0; k < 9; k++){
+      const a = ((t*.6 + k/9) % 1);
+      c.beginPath(); c.strokeStyle = `rgba(234,246,255,${(1-a)*.35})`; c.lineWidth = 1.5;
+      c.moveTo(bx - L*.06 - a*w*.35, by + L*.1 + a*h*.5); c.quadraticCurveTo(bx, by - L*.1 + a*h*.2, bx + L*.06 + a*w*.35, by + L*.1 + a*h*.5); c.stroke();
+    }
+    c.save(); c.translate(bx, by + Math.sin(t*1.3)*3); c.rotate(-.06); c.scale(L/2, L/2);
+    c.beginPath(); board.forEach(([x,y],i) => i ? c.lineTo(x,y) : c.moveTo(x,y)); for (let i = N; i >= 0; i--) c.lineTo(-board[i][0], board[i][1]); c.closePath();
+    c.shadowColor = 'rgba(0,0,0,.5)'; c.shadowBlur = 30; c.shadowOffsetY = 12;
+    const bg2 = c.createLinearGradient(0, -1, 0, 1); bg2.addColorStop(0, '#19e3ff'); bg2.addColorStop(1, '#2f6bff');
+    c.fillStyle = bg2; c.fill(); c.shadowColor = 'transparent';
+    c.fillStyle = '#081019'; c.fillRect(-.09, .04, .18, .5);
+    // paddler (top-down): shoulders, head, paddle
+    const sway = Math.sin(t*2.4);
+    c.fillStyle = '#02070d';
+    c.beginPath(); c.ellipse(0, .26, .11, .05, 0, 0, Math.PI*2); c.fill();
+    c.beginPath(); c.arc(0, .24, .045, 0, Math.PI*2); c.fill();
+    c.strokeStyle = '#eaf6ff'; c.lineWidth = .012; c.beginPath(); c.moveTo(.18*sway, .05); c.lineTo(-.02*sway + .03, .5); c.stroke();
+    c.fillStyle = '#eaf6ff'; c.beginPath(); c.ellipse(.18*sway, .05, .03, .06, 0, 0, Math.PI*2); c.fill();
+    c.restore();
+    requestAnimationFrame(draw);
+  }
+})();
+
+/* =========================================================
+   Init
+   ========================================================= */
+cfg.name = nm.value;
+applyLang(LANG);
+renderConfig();
+observeReveals();
+onScroll();
+})();
+</script>
+</body>
+</html>
