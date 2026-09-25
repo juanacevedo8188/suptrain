@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Flying Fish Board Co.</title>
 <meta name="description" content="Custom stand up paddle boards, handcrafted in Stuart, Florida. Closed-cell foam, carbon fiber, custom resin tint. Find your glide.">
-<meta name="theme-color" content="#140b2e">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23140b2e'/><circle cx='50' cy='58' r='26' fill='%23ff7a45'/><rect x='0' y='60' width='100' height='40' fill='%231b1638'/></svg>">
+<meta name="theme-color" content="#4fb3e3">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2386cdee'/><circle cx='74' cy='26' r='12' fill='%23fff6c9'/><rect y='52' width='100' height='30' fill='%232aa9c2'/><rect y='78' width='100' height='22' fill='%23f3e3c3'/></svg>">
 <style>
 :root{
   --night:#140b2e;
@@ -15,8 +15,11 @@
   --coral:#f0584a;
   --peach:#ffb25b;
   --sun:#ffe08a;
-  --neon:#ff4fa3;
-  --neon2:#37f3ff;
+  --neon:#ff7a59;
+  --neon2:#2aa9c2;
+  --navy:#0d2c3f;
+  --sea:#2aa9c2;
+  --sand:#f3e3c3;
   --shop:#121212;
   --shop2:#1b1b1b;
   --concrete:#262624;
@@ -41,15 +44,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 img,svg,canvas{display:block}
 .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 20px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s,color .2s}
 .btn:hover{transform:translateY(-2px)}
-.btn.neon{border:1.5px solid var(--neon);color:#fff;box-shadow:0 0 12px rgba(255,79,163,.6),inset 0 0 12px rgba(255,79,163,.35);text-shadow:0 0 8px var(--neon)}
-.btn.neon:hover{background:var(--neon);color:#1a0716}
+.btn.neon{background:var(--navy);color:#fff;border:1.5px solid var(--navy)}
+.btn.neon:hover{background:var(--neon);border-color:var(--neon)}
 .btn.solid{background:var(--paper);color:var(--ink)}
 .btn.safety{background:var(--safety);color:#111}
-.btn.ghost{border:1.5px solid rgba(246,241,231,.45)}
-.btn.ghost:hover{background:var(--paper);color:var(--ink)}
+.btn.ghost{border:1.5px solid var(--navy);color:var(--navy)}
+.btn.ghost:hover{background:var(--navy);color:#fff}
 
 /* ---------- NAV ---------- */
 .nav{position:fixed;inset:0 0 auto 0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px var(--gutter);transition:background .3s}
+.nav:not(.solid){color:var(--navy)}
+.nav:not(.solid) .brand img{filter:invert(1)}
+.nav:not(.solid) .lang{border-color:rgba(13,44,63,.35)}
+.nav:not(.solid) .lang button.on{background:var(--navy);color:#fff}
 .nav.solid{background:rgba(18,18,18,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 1px 0 rgba(255,255,255,.08)}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand img{width:42px;height:42px}
@@ -65,14 +72,17 @@ img,svg,canvas{display:block}
 
 /* ---------- HERO: South Florida sunset ---------- */
 #hero{position:relative;height:var(--stageH);min-height:620px;overflow:hidden;
-  background:linear-gradient(180deg,#140b2e 0%,#2a0f45 18%,#5b1a5e 36%,#a4286a 50%,#e0484f 60%,#ff8a4c 67%,#ffc46b 71%)}
-.stars{position:absolute;inset:0 0 50% 0;background-image:radial-gradient(1px 1px at 12% 18%,#fff8,transparent),radial-gradient(1px 1px at 28% 8%,#fff6,transparent),radial-gradient(1.5px 1.5px at 44% 22%,#fff7,transparent),radial-gradient(1px 1px at 63% 12%,#fff6,transparent),radial-gradient(1px 1px at 78% 26%,#fff5,transparent),radial-gradient(1.5px 1.5px at 90% 9%,#fff8,transparent),radial-gradient(1px 1px at 6% 34%,#fff4,transparent),radial-gradient(1px 1px at 55% 5%,#fff6,transparent)}
-.sunwrap{position:absolute;left:50%;top:71%;width:min(46vw,440px);aspect-ratio:1;transform:translate(-50%,-62%)}
-.sun{width:100%;height:100%;border-radius:50%;background:linear-gradient(180deg,#fff1a8 0%,#ffc85a 35%,#ff7a45 62%,#ff3f6c 100%);
-  -webkit-mask-image:linear-gradient(180deg,#000 52%,transparent 52% 55%,#000 55% 63%,transparent 63% 67%,#000 67% 74%,transparent 74% 79%,#000 79% 85%,transparent 85% 91%,#000 91%);
-  mask-image:linear-gradient(180deg,#000 52%,transparent 52% 55%,#000 55% 63%,transparent 63% 67%,#000 67% 74%,transparent 74% 79%,#000 79% 85%,transparent 85% 91%,#000 91%);
-  box-shadow:0 0 120px 30px rgba(255,120,80,.35)}
+  background:linear-gradient(180deg,#3fa9dc 0%,#7cc8ec 30%,#bfe6f6 52%,#e3f5fb 60%)}
+.stars{display:none}
+.sunwrap{position:absolute;right:12%;top:16%;width:clamp(64px,8vw,116px);aspect-ratio:1}
+.sun{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle,#fffef6 0 55%,#fff3b8 70%,rgba(255,243,184,0) 72%);box-shadow:0 0 90px 40px rgba(255,251,220,.75)}
 #heroCv{position:absolute;inset:0;width:100%;height:100%}
+.clouds{position:absolute;inset:0 0 45% 0;pointer-events:none;overflow:hidden}
+.cloud{position:absolute;height:26px;border-radius:999px;background:#fff;opacity:.9;animation:drift linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:46%;height:180%;left:16%;bottom:30%}
+.cloud::after{width:34%;height:140%;left:50%;bottom:30%}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
 .palm{position:absolute;bottom:0;pointer-events:none;transform-origin:50% 100%}
 .palm svg{width:100%;height:auto;overflow:visible}
 .palm .fronds{transform-origin:var(--ox) var(--oy);animation:sway 6s ease-in-out infinite}
@@ -80,20 +90,16 @@ img,svg,canvas{display:block}
 .palm.r{right:-4vw;width:clamp(150px,20vw,300px);transform:scaleX(-1)}
 .palm.r .fronds{animation-delay:-2.5s;animation-duration:7s}
 @keyframes sway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(3deg)}}
-.sign{position:absolute;z-index:3;left:50%;top:clamp(90px,15vh,150px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;text-align:center;width:min(92vw,900px)}
-.sign img{width:clamp(74px,9vw,110px);height:auto;filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 12px var(--neon)) drop-shadow(0 0 28px var(--neon))}
-.neon-t{font-weight:200;font-size:clamp(48px,10vw,132px);letter-spacing:.06em;line-height:.95;color:#ffe9f5;margin-top:10px;
-  text-shadow:0 0 4px #fff,0 0 10px var(--neon),0 0 22px var(--neon),0 0 44px var(--neon),0 0 80px rgba(255,79,163,.6)}
-.neon-t .fl{animation:flicker 5.5s infinite}
-.neon-t .fl2{animation:flicker 7.3s 1.2s infinite}
+.sign{position:absolute;z-index:3;left:50%;top:clamp(80px,12vh,120px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;text-align:center;width:min(94vw,1100px)}
+.sign img{width:clamp(70px,7vw,96px);height:auto;filter:invert(1);opacity:.9}
+.neon-t{font-weight:900;white-space:nowrap;font-size:clamp(40px,8.4vw,112px);letter-spacing:.05em;line-height:.95;color:var(--navy);margin-top:12px;text-shadow:0 3px 0 rgba(255,255,255,.55)}
 @keyframes flicker{0%,18%,22%,25%,53%,57%,100%{opacity:1}20%,24%,55%{opacity:.25;text-shadow:none}}
-.neon-s{font-weight:300;letter-spacing:.6em;font-size:clamp(12px,1.6vw,18px);color:#e6feff;margin-top:12px;padding-left:.6em;
-  text-shadow:0 0 4px #fff,0 0 10px var(--neon2),0 0 24px var(--neon2)}
-.hero-copy{margin-top:22px;font-size:clamp(15px,1.4vw,18px);line-height:1.5;color:#ffe9dc;max-width:46ch;text-shadow:0 2px 12px rgba(40,5,40,.6)}
-.hero-copy b{color:#fff}
+.neon-s{font-weight:800;letter-spacing:.6em;font-size:clamp(12px,1.6vw,18px);color:var(--neon);margin-top:12px;padding-left:.6em}
+.hero-copy{margin-top:22px;font-size:clamp(15px,1.4vw,18px);line-height:1.5;color:#1d4a63;max-width:46ch}
+.hero-copy b{color:var(--navy)}
 .sign .ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:22px}
-.hero-foot{position:absolute;z-index:3;left:0;right:0;bottom:20px;display:flex;justify-content:space-between;padding:0 var(--gutter);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,233,220,.75);pointer-events:none}
-@media (max-width:640px){.hero-foot span:last-child{display:none}.sign{top:84px}}
+.hero-foot{position:absolute;z-index:3;left:0;right:0;bottom:20px;display:flex;justify-content:space-between;padding:0 var(--gutter);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(13,44,63,.7);pointer-events:none}
+@media (max-width:640px){.hero-foot span:last-child{display:none}.sign{top:84px}.sunwrap{right:7%;top:53%;width:52px}.mate .ph{aspect-ratio:16/9}}
 
 /* ---------- GARAGE DOOR ---------- */
 #door{position:relative;height:240vh;background:var(--shop)}
@@ -203,41 +209,45 @@ img,svg,canvas{display:block}
 .also b{color:var(--paper);font-weight:600}
 
 /* ---------- TEAM (back outside, golden hour) ---------- */
-#team{position:relative;padding:clamp(90px,12vw,150px) var(--gutter);background:linear-gradient(180deg,#161412 0%,#3a1553 14%,#a4286a 38%,#f0584a 62%,#ffb25b 100%);overflow:hidden}
-#team .sec-h .k{color:#ffe08a}
-#team .sec-h p{color:#ffe3d4}
+#team{position:relative;padding:clamp(90px,12vw,150px) var(--gutter);background:linear-gradient(180deg,#161412 0%,#0e4a5a 12%,#2398b8 34%,#5fd0cc 62%,#bfeee3 82%,#f3e3c3 100%);overflow:hidden}
+#team .sec-h .k{color:#bff3ee}
+#team .sec-h p{color:#e8fbfa}
 .crew{margin-top:clamp(40px,6vw,70px);display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
-.mate{background:rgba(20,11,46,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s}
+.mate{background:rgba(255,255,255,.9);color:var(--navy);border:1px solid rgba(13,44,63,.1);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s;box-shadow:0 18px 40px -20px rgba(13,44,63,.45)}
 .mate:hover{transform:translateY(-4px)}
-.mate .ph{position:relative;aspect-ratio:4/3;display:grid;place-items:center;background:radial-gradient(circle at 50% 60%,#2a0f45,#140b2e)}
+.mate .ph{position:relative;aspect-ratio:4/3;display:grid;place-items:center;background:linear-gradient(160deg,#dff6f1,#8fe3d6)}
 .mate .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 70%}
-.mate .ph .ini{font-weight:200;font-size:64px;letter-spacing:.08em;color:#fff;text-shadow:0 0 4px #fff,0 0 12px var(--c,var(--neon)),0 0 30px var(--c,var(--neon))}
-.mate .ph .cc{position:absolute;right:10px;top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;background:rgba(0,0,0,.55);padding:4px 7px;border-radius:4px}
+.mate .ph .ini{font-weight:900;font-size:64px;letter-spacing:.06em;color:var(--c,var(--navy))}
+.mate .ph .cc{position:absolute;right:10px;top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;background:var(--navy);color:#fff;padding:4px 7px;border-radius:4px}
 .mate .bd{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
-.mate .role{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#ffc46b}
+.mate .role{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#e0603f}
 .mate h3{font-size:19px;font-weight:800;letter-spacing:.02em}
-.mate ul{list-style:none;display:flex;flex-direction:column;gap:5px;font-size:13px;line-height:1.4;color:#f1dbe8}
-.mate li::before{content:"✦ ";color:var(--neon)}
-.mate .board{margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);font-family:var(--mono);font-size:11px;color:#fff}
+.mate ul{list-style:none;display:flex;flex-direction:column;gap:5px;font-size:13px;line-height:1.4;color:#36566a}
+.mate li::before{content:"● ";color:var(--sea);font-size:9px;vertical-align:1px}
+.mate .board{margin-top:auto;padding-top:10px;border-top:1px solid rgba(13,44,63,.12);font-family:var(--mono);font-size:11px;color:var(--navy)}
 .mate .links{display:flex;gap:12px;font-family:var(--mono);font-size:11px}
 .mate .links a{text-decoration:none;border-bottom:1px solid currentColor}
 
 /* ---------- OPEN / CONTACT ---------- */
-#open{position:relative;padding:clamp(90px,12vw,150px) var(--gutter);background:linear-gradient(180deg,#140b2e,#0b0718);text-align:center;overflow:hidden}
-.opensign{display:inline-block;border:3px solid rgba(255,70,70,.9);border-radius:16px;padding:10px 34px 14px;box-shadow:0 0 14px rgba(255,60,60,.8),inset 0 0 14px rgba(255,60,60,.6);animation:flickerbox 6s infinite}
-.opensign span{font-weight:300;font-size:clamp(54px,11vw,140px);letter-spacing:.14em;color:#ffe4e4;text-shadow:0 0 4px #fff,0 0 12px #ff3b3b,0 0 30px #ff3b3b,0 0 60px rgba(255,59,59,.7)}
-@keyframes flickerbox{0%,40%,44%,100%{opacity:1}42%{opacity:.4}}
+#open{position:relative;padding:clamp(90px,12vw,150px) var(--gutter);background:linear-gradient(180deg,#f3e3c3,#f8f0de);color:var(--navy);text-align:center;overflow:hidden}
+.opensign{position:relative;display:inline-block;background:#fffdf7;border:4px solid var(--navy);border-radius:10px;padding:10px 38px 14px;box-shadow:0 18px 30px -12px rgba(13,44,63,.35);transform:rotate(-2deg);margin-top:40px}
+.opensign::before,.opensign::after{content:"";position:absolute;top:-44px;width:2px;height:44px;background:#8a6b4a}
+.opensign::before{left:22%;transform:rotate(-8deg)}.opensign::after{right:22%;transform:rotate(8deg)}
+.opensign span{font-weight:900;font-size:clamp(54px,11vw,140px);letter-spacing:.12em;color:var(--navy)}
+.opensign small{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--neon);margin-top:2px}
+
 #open h2{font-size:clamp(28px,4vw,52px);font-weight:900;text-transform:uppercase;margin-top:34px;line-height:1}
-#open p{color:#c9bfd8;max-width:52ch;margin:14px auto 0;line-height:1.6}
+#open p{color:#4a6272;max-width:52ch;margin:14px auto 0;line-height:1.6}
 #open .ctas{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
-#open .addr{margin-top:34px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:#b3a9c6;line-height:1.9}
-footer{padding:24px var(--gutter) calc(24px + env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:#07040f;font-family:var(--mono);font-size:11px;color:#8b82a0}
+#open .addr{margin-top:34px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:#4a6272;line-height:1.9}
+#open .addr a{color:var(--navy)}
+footer{padding:24px var(--gutter) calc(24px + env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:var(--navy);font-family:var(--mono);font-size:11px;color:#bcd6e0}
 
 .rv{opacity:0;transform:translateY(30px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
 .rv.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .palm .fronds,.neon-t .fl,.neon-t .fl2,.htag,.opensign,.dhint i{animation:none}
+  .palm .fronds,.cloud,.htag,.dhint i{animation:none}
   .rv{opacity:1;transform:none;transition:none}
 }
 </style>
@@ -258,9 +268,9 @@ footer{padding:24px var(--gutter) calc(24px + env(safe-area-inset-bottom));displ
   <div class="lang" role="group" aria-label="Language"><button data-lang="en" class="on">EN</button><button data-lang="es">ES</button></div>
 </header>
 
-<!-- ================= HERO: sunset, neon, palms, flying fish ================= -->
+<!-- ================= HERO: South Florida beach, palms, flying fish ================= -->
 <section id="hero">
-  <div class="stars" aria-hidden="true"></div>
+  <div class="clouds" aria-hidden="true"><i class="cloud" style="top:14%;width:150px;animation-duration:120s;animation-delay:-40s"></i><i class="cloud" style="top:26%;width:100px;opacity:.75;animation-duration:150s;animation-delay:-100s"></i><i class="cloud" style="top:8%;width:120px;opacity:.8;animation-duration:170s;animation-delay:-10s"></i><i class="cloud" style="top:34%;width:80px;opacity:.6;animation-duration:200s;animation-delay:-150s"></i></div>
   <div class="sunwrap" aria-hidden="true"><div class="sun"></div></div>
   <canvas id="heroCv" aria-hidden="true"></canvas>
   <div class="palm l" id="palmL" aria-hidden="true"></div>
@@ -397,7 +407,7 @@ footer{padding:24px var(--gutter) calc(24px + env(safe-area-inset-bottom));displ
 
 <!-- ================= OPEN ================= -->
 <section id="open">
-  <div class="opensign rv"><span>OPEN</span></div>
+  <div class="opensign rv"><span>OPEN</span><small>STUART · FLORIDA</small></div>
   <h2 class="rv" data-i18n="o.h">For custom orders</h2>
   <p class="rv" data-i18n="o.p">Tell us how you paddle, where, and how fast you want to go. We'll shape the rest.</p>
   <div class="ctas rv">
@@ -472,24 +482,24 @@ function palmSVG(seed, lean){
   let rings = '';
   for (let k = 0; k < 16; k++){
     const t = k/16, x = 120 + (topX-120)*t*t + Math.sin(t*3)*6, y = 600 - (600-topY)*t, w = 16 - t*7;
-    rings += `<path d="M${x-w} ${y} Q${x} ${y+5} ${x+w} ${y}" stroke="#2a1233" stroke-width="2" fill="none" opacity=".6"/>`;
+    rings += `<path d="M${x-w} ${y} Q${x} ${y+5} ${x+w} ${y}" stroke="#5e4630" stroke-width="2" fill="none" opacity=".7"/>`;
   }
-  const trunk = `<path d="M104 600 C110 420 ${topX-30} 250 ${topX-6} ${topY} L${topX+6} ${topY+4} C${topX-14} 250 140 420 138 600Z" fill="#12081e"/>`;
+  const trunk = `<path d="M104 600 C110 420 ${topX-30} 250 ${topX-6} ${topY} L${topX+6} ${topY+4} C${topX-14} 250 140 420 138 600Z" fill="#8a6b4a"/>`;
   let fronds = '';
   const angles = [-160,-130,-100,-70,-40,-12,15,40];
   angles.forEach(a => {
     const len = 150 + r()*70, rad = a*Math.PI/180, ex = topX + Math.cos(rad)*len, ey = topY + Math.sin(rad)*len*.55 + len*.35;
     const cx = topX + Math.cos(rad)*len*.5, cy = topY - 40 + Math.sin(rad)*len*.2;
     // leaflets along the frond
-    let leaf = `<path d="M${topX} ${topY} Q${cx} ${cy} ${ex} ${ey}" stroke="#12081e" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    let leaf = `<path d="M${topX} ${topY} Q${cx} ${cy} ${ex} ${ey}" stroke="#2c6e45" stroke-width="5" fill="none" stroke-linecap="round"/>`;
     for (let k = 1; k < 14; k++){
       const t = k/14, px = (1-t)*(1-t)*topX + 2*(1-t)*t*cx + t*t*ex, py = (1-t)*(1-t)*topY + 2*(1-t)*t*cy + t*t*ey;
       const ll = 42*(1 - t*.6);
-      leaf += `<path d="M${px} ${py} q${-8} ${ll*.6} ${-4} ${ll}" stroke="#12081e" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M${px} ${py} q${8} ${ll*.6} ${4} ${ll}" stroke="#12081e" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+      leaf += `<path d="M${px} ${py} q${-8} ${ll*.6} ${-4} ${ll}" stroke="#3a8a55" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M${px} ${py} q${8} ${ll*.6} ${4} ${ll}" stroke="#2f7d4f" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
     }
     fronds += leaf;
   });
-  const coconuts = `<circle cx="${topX-8}" cy="${topY+12}" r="9" fill="#12081e"/><circle cx="${topX+8}" cy="${topY+14}" r="8" fill="#12081e"/>`;
+  const coconuts = `<circle cx="${topX-8}" cy="${topY+12}" r="9" fill="#6b4a2a"/><circle cx="${topX+8}" cy="${topY+14}" r="8" fill="#5a3d22"/>`;
   return `<svg viewBox="0 0 320 600" aria-hidden="true">${trunk}${rings}<g class="fronds" style="--ox:${topX}px;--oy:${topY}px">${fronds}${coconuts}</g></svg>`;
 }
 $('#palmL').innerHTML = palmSVG(7, 30);
@@ -502,8 +512,8 @@ heroSize();
 const fish = [];
 let nextFish = 0, heroOn = true;
 function spawnFish(now){
-  const horizon = HH*.71, dir = Math.random() < .5 ? 1 : -1, x0 = HW*(.15 + Math.random()*.7);
-  fish.push({t0: now, dur: 1300 + Math.random()*700, x0, y0: horizon + 30 + Math.random()*(HH*.2), dx: dir*(160 + Math.random()*260), h: 70 + Math.random()*120, s: .7 + Math.random()*.6});
+  const horizon = HH*.6, dir = Math.random() < .5 ? 1 : -1, x0 = HW*(.15 + Math.random()*.7);
+  fish.push({t0: now, dur: 1300 + Math.random()*700, x0, y0: horizon + 20 + Math.random()*(HH*.18), dx: dir*(160 + Math.random()*260), h: 70 + Math.random()*120, s: .7 + Math.random()*.6});
 }
 function drawFishShape(g, s){
   // side-view flying fish silhouette, nose to +x
@@ -512,30 +522,48 @@ function drawFishShape(g, s){
 }
 function heroFrame(now){
   if (!heroOn) return;
-  const t = now/1000, horizon = HH*.71, W = HW, H = HH;
+  const t = now/1000, horizon = HH*.6, W = HW, H = HH, shore = HH*.87;
   hg.setTransform(HD,0,0,HD,0,0); hg.clearRect(0,0,W,H);
-  // sea
-  const sg = hg.createLinearGradient(0, horizon, 0, H);
-  sg.addColorStop(0, '#ff8a5c'); sg.addColorStop(.08, '#c9406a'); sg.addColorStop(.4, '#4a1a5c'); sg.addColorStop(1, '#140b2e');
+  // sea: deep blue at the horizon to shallow turquoise at the shore
+  const sg = hg.createLinearGradient(0, horizon, 0, shore);
+  sg.addColorStop(0, '#1d74a8'); sg.addColorStop(.35, '#2398b8'); sg.addColorStop(.75, '#3cc3c6'); sg.addColorStop(1, '#8fe3d6');
   hg.fillStyle = sg; hg.fillRect(0, horizon, W, H - horizon);
-  // sun reflection: broken horizontal strokes
-  const sunW = Math.min(W*.46, 440);
-  for (let y = horizon + 3, k = 0; y < H; y += 5 + k*.35, k++){
-    const depth = (y - horizon)/(H - horizon), w = sunW*(.55 - depth*.25);
-    const segs = 3 + (k % 3);
-    for (let sgi = 0; sgi < segs; sgi++){
-      const off = Math.sin(t*1.3 + k*.9 + sgi*2.1)*w*.18, sw = w/segs*(.5 + .4*Math.sin(t*2 + k + sgi));
-      const x = W/2 - w/2 + sgi*w/segs + off;
-      hg.globalAlpha = (1 - depth)*.8; hg.fillStyle = depth < .3 ? '#ffd27a' : '#ff7a6b';
-      hg.fillRect(x, y, Math.max(2, sw), 2);
+  hg.fillStyle = 'rgba(255,255,255,.55)'; hg.fillRect(0, horizon, W, 1.5);
+  // sun glitter under the sun
+  const sunX = W*.88 - Math.min(W*.08, 58);
+  for (let y = horizon + 4, k = 0; y < shore - 20; y += 6 + k*.25, k++){
+    const depth = (y - horizon)/(shore - horizon), spread = 30 + depth*W*.22;
+    for (let j = 0; j < 3; j++){
+      const a = Math.max(0, Math.sin(t*2.2 + k*1.7 + j*2.4));
+      if (a < .35) continue;
+      const x = sunX + Math.sin(k*12.9 + j*7.3)*spread + Math.sin(t + k)*6;
+      hg.globalAlpha = a*(1 - depth*.7)*.9; hg.fillStyle = '#ffffff';
+      hg.fillRect(x, y, 6 + a*14, 1.6);
     }
   }
-  // scattered glints
-  for (let k = 0; k < 40; k++){
-    const x = (k*97.3 % W), y = horizon + ((k*53.7) % (H - horizon)), a = Math.max(0, Math.sin(t*1.7 + k*1.3));
-    hg.globalAlpha = a*.35; hg.fillStyle = '#ffb3c8'; hg.fillRect(x + Math.sin(t + k)*8, y, 10 + (k % 5)*4, 1.5);
+  // swell lines rolling toward the shore
+  for (let k = 0; k < 7; k++){
+    const u = ((t*.05 + k/7) % 1), y = horizon + (shore - horizon)*u*u;
+    hg.globalAlpha = .1 + u*.25; hg.strokeStyle = '#ffffff'; hg.lineWidth = .8 + u*1.6;
+    hg.beginPath();
+    for (let x = 0; x <= W; x += 20){ const yy = y + Math.sin(x*.012 + k*3 + t*.6)*(1 + u*4); x ? hg.lineTo(x, yy) : hg.moveTo(x, yy); }
+    hg.stroke();
   }
   hg.globalAlpha = 1;
+  // shore: wet sand, foam line washing in and out, dry sand
+  const wash = Math.sin(t*.7)*10;
+  const shoreY = x => shore + wash + Math.sin(x*.008 + t*.5)*5 + Math.sin(x*.023 + 1.3)*3;
+  hg.beginPath(); hg.moveTo(0, H);
+  for (let x = 0; x <= W; x += 10) hg.lineTo(x, shoreY(x) - 6);
+  hg.lineTo(W, H); hg.closePath(); hg.fillStyle = '#d9c49b'; hg.fill();
+  hg.beginPath(); hg.moveTo(0, H);
+  for (let x = 0; x <= W; x += 10) hg.lineTo(x, shoreY(x) + 12 - wash*.6);
+  hg.lineTo(W, H); hg.closePath(); hg.fillStyle = '#f1e2c2'; hg.fill();
+  hg.beginPath();
+  for (let x = 0; x <= W; x += 8){ const y = shoreY(x) - 6; x ? hg.lineTo(x, y) : hg.moveTo(x, y); }
+  hg.strokeStyle = 'rgba(255,255,255,.95)'; hg.lineWidth = 5; hg.stroke();
+  hg.strokeStyle = 'rgba(255,255,255,.45)'; hg.lineWidth = 12; hg.stroke();
+  for (let x = 0; x < W; x += 13){ const y = shoreY(x) - 6 - Math.abs(Math.sin(x*.7 + t*3))*6; hg.fillStyle = 'rgba(255,255,255,.8)'; hg.fillRect(x, y, 3, 2); }
   // leaping flying fish
   if (!REDUCED && now > nextFish){ spawnFish(now); if (Math.random() < .35) spawnFish(now + 120); nextFish = now + 1800 + Math.random()*2200; }
   for (let i = fish.length - 1; i >= 0; i--){
@@ -546,14 +574,14 @@ function heroFrame(now){
     const vy = -f.h*4*(1 - 2*uu), ang = Math.atan2(vy/f.dur*1000, f.dx/f.dur*1000);
     if (u <= 1){
       hg.save(); hg.translate(x, y); if (f.dx < 0){ hg.scale(-1, 1); hg.rotate(-ang + Math.PI); } else hg.rotate(ang);
-      hg.fillStyle = '#1a0a26'; drawFishShape(hg, f.s); hg.restore();
+      hg.fillStyle = '#0d2c3f'; drawFishShape(hg, f.s); hg.restore();
     }
     // splashes at take-off and landing
     [[0, f.x0, f.y0], [1, f.x0 + f.dx, f.y0]].forEach(([at, sx, sy]) => {
       const a = (u - at)*3; if (a < 0 || a > 1) return;
-      hg.strokeStyle = `rgba(255,220,200,${(1-a)*.8})`; hg.lineWidth = 1.5;
+      hg.strokeStyle = `rgba(255,255,255,${(1-a)*.9})`; hg.lineWidth = 1.5;
       hg.beginPath(); hg.ellipse(sx, sy, 6 + a*26, 2 + a*6, 0, 0, Math.PI*2); hg.stroke();
-      hg.fillStyle = `rgba(255,230,210,${1-a})`;
+      hg.fillStyle = `rgba(255,255,255,${1-a})`;
       for (let d = 0; d < 6; d++){ const dx = (d - 2.5)*5*a*1.6, dy = -Math.sin(a*Math.PI)*(10 + d%3*6); hg.fillRect(sx + dx, sy + dy, 2, 2); }
     });
   }
@@ -689,26 +717,26 @@ function renderRack(){
    TEAM — EDITAR: roster y logros (fuentes: TotalSUP, ICF, prensa)
    ========================================================= */
 const CREW = [
-  {n:'Eri Tenório', ini:'ET', cc:'BRA', c:'#37f3ff', role:{en:'Pro team',es:'Pro team'}, board:`Freedom Pro Dugout 14' × 21.75"`,
+  {n:'Eri Tenório', ini:'ET', cc:'BRA', c:'#1c8fa6', role:{en:'Pro team',es:'Pro team'}, board:`Freedom Pro Dugout 14' × 21.75"`,
    h:{en:['3× Brazilian national champion','3 titles · ICF SUP World Cup, Sarasota 2023','Bronze · ICF SUP Worlds, Sarasota 2024'], es:['3× campeón brasileño','3 títulos · Copa del Mundo ICF SUP, Sarasota 2023','Bronce · Mundial ICF SUP, Sarasota 2024']}},
   {n:'Jake Portwood', ini:'JP', cc:'USA', role:{en:'Pro team',es:'Pro team'},
    h:{en:['USA SUP national champion · 2024','Two-time national champion'], es:['Campeón nacional USA SUP · 2024','Dos veces campeón nacional']}},
-  {n:'Maddie Miller', ini:'MM', cc:'USA', c:'#ffe08a', role:{en:'Team rider',es:'Team rider'},
+  {n:'Maddie Miller', ini:'MM', cc:'USA', c:'#e0603f', role:{en:'Team rider',es:'Team rider'},
    h:{en:['USA SUP national champion · 2024'], es:['Campeona nacional USA SUP · 2024']}},
   {n:'Santino Basaldella', photo:true, cc:'ARG', role:{en:'Team rider',es:'Team rider'}, board:'Freedom Pro',
    h:{en:['2× gold · South American Games, Santa Fe 2026','Bronze · Pan American Games, Santiago 2023','5× Argentine champion'], es:['2 oros · Juegos Suramericanos, Santa Fe 2026','Bronce · Juegos Panamericanos, Santiago 2023','5× campeón argentino']},
    links:[['@santibasa4','https://www.instagram.com/santibasa4/'],['web ↗','https://santino-basaldella.vercel.app']]},
-  {n:'Steve Miller', ini:'SM', cc:'USA', c:'#37f3ff', role:{en:'Team rider',es:'Team rider'},
+  {n:'Steve Miller', ini:'SM', cc:'USA', c:'#1c8fa6', role:{en:'Team rider',es:'Team rider'},
    h:{en:['USA SUP national champion · Masters'], es:['Campeón nacional USA SUP · Masters']}},
   {n:'Filippo Mercuriali', ini:'FM', cc:'ITA', role:{en:'Team rider',es:'Team rider'}, board:'Freedom Pro',
    h:{en:['Racing the Freedom Pro in Europe since 2025'], es:['Corre en Europa con la Freedom Pro desde 2025']}},
-  {n:'Kim Barnes', ini:'KB', c:'#ffe08a', role:{en:'Pro team',es:'Pro team'}, h:{en:['Core pro team'], es:['Pro team principal']}},
-  {n:'Cam Carney', ini:'CC', c:'#37f3ff', role:{en:'Team rider',es:'Team rider'}, h:{en:['Newest member of the team'], es:['El más nuevo del equipo']}},
+  {n:'Kim Barnes', ini:'KB', c:'#e0603f', role:{en:'Pro team',es:'Pro team'}, h:{en:['Core pro team'], es:['Pro team principal']}},
+  {n:'Cam Carney', ini:'CC', c:'#1c8fa6', role:{en:'Team rider',es:'Team rider'}, h:{en:['Newest member of the team'], es:['El más nuevo del equipo']}},
 ];
 function renderCrew(){
   $('#crew').innerHTML = CREW.map(m => `
     <article class="mate rv">
-      <div class="ph">${m.photo ? `<img src="${$('#santi-src').src}" alt="${m.n}" loading="lazy">` : `<span class="ini" style="--c:${m.c || 'var(--neon)'}">${m.ini}</span>`}${m.cc ? `<span class="cc">${m.cc}</span>` : ''}</div>
+      <div class="ph">${m.photo ? `<img src="${$('#santi-src').src}" alt="${m.n}" loading="lazy">` : `<span class="ini" style="--c:${m.c || 'var(--navy)'}">${m.ini}</span>`}${m.cc ? `<span class="cc">${m.cc}</span>` : ''}</div>
       <div class="bd">
         <div class="role">${m.role[LANG]}</div>
         <h3>${m.n}</h3>
